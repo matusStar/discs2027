@@ -1,21 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>/</loc>
+<loc>http://localhost:4000/discs2027/</loc>
 </url>
 <url>
-<loc>/info/</loc>
+<loc>http://localhost:4000/discs2027/info/</loc>
 </url>
 <url>
-<loc>/mailing-list/</loc>
+<loc>http://localhost:4000/discs2027/mailing-list/</loc>
 </url>
 <url>
-<loc>/participants/</loc>
+<loc>http://localhost:4000/discs2027/participants/</loc>
 </url>
 <url>
-<loc>/programme/</loc>
+<loc>http://localhost:4000/discs2027/programme/</loc>
 </url>
 <url>
-<loc>/register/</loc>
+<loc>http://localhost:4000/discs2027/register/</loc>
+</url>
+<url>
+<loc>http://localhost:4000/discs2027/assets/images/Programme2025.pdf</loc>
+<lastmod>2026-10-17T18:27:43+01:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/discs2027/assets/images/talk_abstracts.pdf</loc>
+<lastmod>2026-10-17T18:27:43+01:00</lastmod>
 </url>
 </urlset>
