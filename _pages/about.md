@@ -40,7 +40,7 @@ For any queries, please email  [TBD](mailto:EMAIL).
 - Abstract submission for talks closes: TBD
 - Outcome of abstract submissions: TBD
 - Final registration and payment deadline: TBD
-- Meeting: 5th July - 7th July
+- Meeting: 5th July - 7th July 2027
 
 ## Code of Conduct 
 
