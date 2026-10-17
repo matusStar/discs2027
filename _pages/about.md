@@ -15,38 +15,32 @@ The UKI discs meeting aims to bring together different astrophysical disc commun
 For any queries, please email [discs2025@herts.ac.uk](mailto:discs2025@herts.ac.uk).
 
 ## Invited Speakers
-- John Ilee (Leeds)
-- Amy Bonsor (Cambridge)
-- Minjae Kim (MSSL, UCL)
+- TBD
 
 ## SOC
-- Phil Lucas (chair - Hertfordshire)
-- Richard Booth (Leeds)
-- Jay Farihi (UCL)
-- Farzana Meru (Warwick)
-- Olja Panic (Leeds)
-- Tim Pearce (Warwick)
-- Emma Whelan (Maynooth)
+- Tim Pearce (chair) - DDs, TCD, Ireland
+- Luca Matra – DDs, TCD, Ireland
+- Farzana Meru - PPDs, Warwick, UK 
+- Pooneh Nazari - PPDs, Warwick, UK 
+- Ayaka Okuya - WDs, Warwick, UK 
+- Loren Held - High-energy + PPDs, Cambridge (UKI2026 co-chair) 
+- Thomas Jannaud - High-energy + PPDs, Cambridge (UKI2026 co-chair) 
 
 ## LOC
-- Phil Lucas (chair - Hertfordshire)
-- Jessica Copeland
-- Jan Forbrich
-- Hugh Jones
-- Michael Kuhn
-- Laurinda Macaringue
-- Hariharan Muthu
-- Mwakoi Namukulo
-- Eoin O'Kelly
-- Simran Singh
-- Gabriella Zsidi
+- Sana Ahmed (co-chair) – TCD
+- Rossella Anania (co-chair) – TCD
+- Jake Byrne – TCD
+- Patricia Luppe – TCD (may not be here in 2027)
+- Zoe Roumeliotis – TCD
+- Matúš Starčok – TCD
+- Oto Ulrich – TCD
 
 ## Important Dates
-- Registration and abstract submission opens: 4 April
-- Abstract submission for talks closes: 22th May (abstract submission for posters remains open)
-- Outcome of abstract submissions: mid-late June
-- Final registration and payment deadline: 31 July
-- Meeting: 8th September - 10th September
+- Registration and abstract submission opens: TBD              
+- Abstract submission for talks closes: TBD
+- Outcome of abstract submissions: TBD
+- Final registration and payment deadline: TBD
+- Meeting: 5th July - 7th July
 
 ## Code of Conduct 
 

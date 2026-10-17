@@ -16,6 +16,7 @@ header:
 The UKI Discs Meeting will take place in [Room N001 of the de Havilland Main Building](https://maps.herts.ac.uk) on the University of Hertfordshire’s de Havilland Campus in Hatfield, Hertfordshire. The university comprises two campuses—College Lane and de Havilland—which are within walking distance of each other and the nearby Galleria shopping centre. A bus also connects the campuses for added convenience.
 
 ## Accommodation {#Accommodation} 
+To be announced
 
 Student rooms are available on the de Havilland Campus at the University of Hertfordshire. These are a convenient and affordable option:
 - **£70** per night (room only)  
@@ -33,7 +34,11 @@ There are relatively few budget hotel options in Hatfield this year. The nearby 
 
 <p id="breakfast-note"><sup>[1]</sup> The prepaid breakfast option in the dining hall is only available on Tuesday 9th and Wednesday 10th. For those needing breakfast on Monday 8th, local options include the Sports Cafe on campus (limited selections) or the Wetherspoons close to campus for a full breakfast.</p>
 
+
+
 ## Campus Map {#Map}
+To be announced
+
 
 The meeting will take place on the de Havilland campus in room N001.
 ![Campus Map](../assets/images/de-Havilland-campus-map.png)
