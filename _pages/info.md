@@ -5,7 +5,7 @@ header:
   image: "/assets/images/Bayfordbury.jpeg"
   caption: "Credit: Calum Morris."
 ---
-
+{% comment %}
 - [Accommodation](#Accommodation)
 - [Campus Map](#Map)
 - [Getting Here](#GettingHere)
@@ -50,7 +50,7 @@ To be specified
 
 ## Access to the Swimming Pool and Gym in the Sports Village {#Gym}
 
-
+{% endcomment %}
 
 
 
