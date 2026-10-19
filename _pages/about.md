@@ -8,7 +8,7 @@ header:
 
 _NOTE: This website is currently being updated for the 2027 conference. The information is not up to date_
 
-The UKI discs meeting aims to bring together different astrophysical disc communities across the UK & Ireland. We are delighted to announce the second meeting of this series will be hosted at the Trinity College Dublin on 5th-7th July 2027! The theme of the meeting will be _TBD_, covering observations and theory. Scientific topics include but are not limited to: protoplanetary discs, protosatellite discs, debris discs, disc formation and evolution, winds and jets, irradiated discs and proplyds, planet-disc interactions and migration, planet and planetesimal formation, exocomets, disc chemistry, distorted and warped discs, discs in binaries, disc instabilities, disc turbulence, etc. The meeting will be held in a hybrid format.
+The UKI discs meeting aims to bring together different astrophysical disc communities across the UK & Ireland. We are delighted to announce the fourth meeting of this series will be hosted at the Trinity College Dublin on 5th-7th July 2027! The theme of the meeting will be _TBD_, covering observations and theory. Scientific topics include but are not limited to: protoplanetary discs, protosatellite discs, debris discs, disc formation and evolution, winds and jets, irradiated discs and proplyds, planet-disc interactions and migration, planet and planetesimal formation, exocomets, disc chemistry, distorted and warped discs, discs in binaries, disc instabilities, disc turbulence, etc. The meeting will be held in a hybrid format.
 
 The UKI discs meeting aims to bring together different astrophysical disc communities across the UK & Ireland. We also welcome attendees from beyond these isles but numbers on-site will be limited to approximately 100.
 
@@ -18,19 +18,19 @@ For any queries, please email  [TBD](mailto:EMAIL).
 - TBD
 
 ## SOC
-- Tim Pearce (chair) - DDs, TCD, Ireland
-- Luca Matra – DDs, TCD, Ireland
-- Farzana Meru - PPDs, Warwick, UK 
-- Pooneh Nazari - PPDs, Warwick, UK 
-- Ayaka Okuya - WDs, Warwick, UK 
-- Loren Held - High-energy + PPDs, Cambridge (UKI2026 co-chair) 
-- Thomas Jannaud - High-energy + PPDs, Cambridge (UKI2026 co-chair) 
+- Tim Pearce (chair) - TCD, Ireland
+- Luca Matra – TCD, Ireland
+- Farzana Meru - Warwick, UK 
+- Pooneh Nazari - Warwick, UK 
+- Ayaka Okuya - Warwick, UK 
+- Loren Held - Cambridge, UK
+- Thomas Jannaud - Cambridge, UK
 
 ## LOC
 - Sana Ahmed (co-chair) – TCD
 - Rossella Anania (co-chair) – TCD
 - Jake Byrne – TCD
-- Patricia Luppe – TCD (may not be here in 2027)
+- Patricia Luppe – TCD
 - Zoe Roumeliotis – TCD
 - Matúš Starčok – TCD
 - Oto Ulrich – TCD
