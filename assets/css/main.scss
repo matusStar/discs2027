@@ -1,0 +1,38 @@
+---
+---
+@charset "utf-8";
+
+@import "minimal-mistakes/skins/dark"; // skin
+@import "minimal-mistakes"; // main partials
+
+/* ---- starry background: page itself must be transparent so the canvas shows ---- */
+html {
+  background:
+    radial-gradient(1100px 700px at 72% 18%, #101a3d 0%, rgba(16, 26, 61, 0) 62%) fixed,
+    radial-gradient(900px 700px at 10% 88%, #1a0f33 0%, rgba(26, 15, 51, 0) 62%) fixed,
+    #03050d;
+}
+body { background: transparent; }
+.masthead, .page__footer { background: rgba(3, 5, 13, .6); }
+
+/* ---- translucent text box around the page text only ---- */
+.page__inner-wrap, .splash .page__content {
+  background: rgba(8, 12, 30, .78);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(160, 180, 255, .12);
+  border-radius: 18px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .45);
+  padding: 1.5rem 2rem 2rem;
+  margin-bottom: 2rem;
+}
+
+/* clean header */
+.masthead { background: transparent; border-bottom: 1px solid rgba(160,180,255,.12); }
+.masthead__inner-wrap { padding-top: .4em; padding-bottom: .4em; }
+.greedy-nav { background: transparent; }
+.greedy-nav a { font-size: .95rem; letter-spacing: .02em; opacity: .85; }
+.greedy-nav a:hover { opacity: 1; text-decoration: none; }
+.greedy-nav .site-title { font-weight: 600; opacity: 1; }
+.greedy-nav .site-logo img { height: 2rem; border-radius: 0; }
+.greedy-nav button { background: transparent; }
