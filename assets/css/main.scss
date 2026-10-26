@@ -37,7 +37,7 @@ body { background: transparent; }
 .greedy-nav .site-logo img { height: 2rem; border-radius: 0; }
 .greedy-nav button { background: transparent; }
 
-#hero3d { position: relative; height: clamp(320px, 60vh, 560px); margin: 0 0 1.5rem; }
+#hero3d { position: relative; height: clamp(600px, 60vh, 560px); margin: 0 0 1.5rem; }
 .hero3d__label { position: absolute; left: 0; right: 0; bottom: .5rem; text-align: center;
   font-size: .85rem; letter-spacing: .08em; opacity: .0; transition: opacity .6s; }
 .hero3d__label.is-fading { opacity: 0; }

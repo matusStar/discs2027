@@ -5314,7 +5314,7 @@ body {
 
 #hero3d {
   position: relative;
-  height: clamp(320px, 60vh, 560px);
+  height: clamp(600px, 60vh, 560px);
   margin: 0 0 1.5rem;
 }
 
