@@ -5312,4 +5312,38 @@ body {
   background: transparent;
 }
 
+#hero3d {
+  position: relative;
+  height: clamp(320px, 60vh, 560px);
+  margin: 0 0 1.5rem;
+}
+
+.hero3d__label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+
+.hero3d__label.is-fading {
+  opacity: 0;
+}
+
+#hero3d {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 2rem;
+}
+
+#hero3d {
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /*# sourceMappingURL=main.css.map */

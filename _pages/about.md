@@ -1,9 +1,7 @@
 ---
 permalink: /
 title: "About"
-header: 
-  image: "/assets/images/HD98800_Mark_Garlick.png"
-  caption: "Credit: © Mark Garlick."
+
 ---
 
 _NOTE: This website is currently being updated for the 2027 conference. The information is not up to date_
