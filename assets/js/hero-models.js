@@ -193,7 +193,7 @@ function system(ctx) {
    The result (where each pixel hits the disc, and the Doppler boost there) is stored in two textures, so drawing is cheap.
    The model also tells the sky to lens the real background stars (see SKY_LENS in sky.js). */
 function blackhole(ctx) {
-  const { T, cfg } = ctx, S = cfg.bhRes || 384, Mw = 0.22, Wd = 5.2, Bmax = Wd / Mw, D = 50, RIN = 6, ROUT = 22, DP = 0.04;
+  const { T, cfg } = ctx, S = cfg.bhRes || 512, Mw = 0.22, Wd = 6.2, Bmax = Wd / Mw, D = 50, RIN = 6, ROUT = 30, DP = 0.04;
   const el = cfg.tilt + Math.atan2(1.5, cfg.cameraZ), sE = Math.sin(el), cE = Math.cos(el);
   const A = new Float32Array(S * S * 4), B = new Float32Array(S * S * 4), cdp = Math.cos(DP), sdp = Math.sin(DP);
   function row(j) {
@@ -233,7 +233,7 @@ function blackhole(ctx) {
     uniforms: { tA: { value: tA }, tB: { value: tB }, uTime: { value: 0 } },
     vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position, 1.); }`,
     fragmentShader: `uniform sampler2D tA, tB; uniform float uTime; varying vec2 vUv;
-const float RIN = ${RIN.toFixed(1)}, BMAX = ${Bmax.toFixed(3)}, TS = ${S.toFixed(1)};
+const float RIN = ${RIN.toFixed(1)}, BMAX = ${Bmax.toFixed(3)}, ROUT = ${ROUT.toFixed(1)}, TS = ${S.toFixed(1)};
 float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7)))*43758.5453); }
 float n2(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f); return mix(mix(h(i), h(i+vec2(1,0)), f.x), mix(h(i+vec2(0,1)), h(i+vec2(1,1)), f.x), f.y); }
 vec3 ramp(float t){
@@ -249,7 +249,8 @@ vec3 disc(vec4 q){
   float turb = .55 + .45*n2(pc*2.2 + vec2(lr*9., lr*5.)) + .25*(n2(pc*5.5 + vec2(lr*26., 3.)) - .5);
   float inten = 8.*pow(x, 2.4)*(.3 + .7*(1. - sqrt(x))) * turb;
   float Tm = pow(x, .75)*g;
-  return ramp(Tm) * inten * pow(clamp(g, .15, 2.2), 3.);                          // relativistic beaming: the approaching side is brighter
+  float edge = smoothstep(ROUT, ROUT*.5, r + (turb - .5)*9.) * smoothstep(RIN, RIN*1.06, r);   // dusty, ragged outer edge; soft inner edge
+  return ramp(Tm) * inten * edge * pow(clamp(g, .15, 2.2), 3.);                          // relativistic beaming: the approaching side is brighter
 }
 vec4 samp(sampler2D t, vec2 uv, out float cov){                                   // bilinear, but only between texels that hit the disc
   vec2 p = uv*TS - .5, i = floor(p), f = fract(p);
