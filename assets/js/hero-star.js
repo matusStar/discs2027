@@ -28,7 +28,7 @@ void main(){
   const c = document.createElement('canvas'); c.width = c.height = 256;
   const g2 = c.getContext('2d'), gr = g2.createRadialGradient(128, 128, 0, 128, 128, 128);
   gr.addColorStop(0, 'rgba(255,240,210,1)'); gr.addColorStop(.12, 'rgba(255,190,110,.55)');
-  gr.addColorStop(.35, 'rgba(255,120,50,.14)'); gr.addColorStop(1, 'rgba(255,80,20,0)');
+  gr.addColorStop(.35, 'rgba(255,120,50,.3)'); gr.addColorStop(1, 'rgba(255,80,20,0)');
   g2.fillStyle = gr; g2.fillRect(0, 0, 256, 256);
   const glowTex = new T.CanvasTexture(c);
   const glow = new T.Sprite(new T.SpriteMaterial({ map: glowTex, blending: T.AdditiveBlending, depthTest: false, depthWrite: false, transparent: true }));
