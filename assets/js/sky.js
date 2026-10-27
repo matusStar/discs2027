@@ -36,6 +36,7 @@ layout(location=2) in vec3 aColor;
 layout(location=3) in vec3 aParam;   // brightness, phase, twinkle amount
 uniform vec2 uView, uCam;
 uniform float uTime, uTwinkle, uSpikeMode, uPsf, uHalo;
+uniform vec4 uLens;                                           // x, y (px), Einstein radius (px), on/off
 flat out vec3 vColor; flat out vec4 vP; flat out vec3 vQ; flat out float vI;
 out vec2 vS;
 void main() {
@@ -46,6 +47,13 @@ void main() {
   const float M = 90.0;                                         // wrap margin in px
   vec2 uv = fract(aPos.xy - uCam / (d * uView));                // parallax: near stars shift more
   vec2 c = uv * (uView + 2.0 * M) - M;
+  if (uLens.w > 0.5) {                                          // point-mass lens: every star gets two images
+    vec2 d = c - uLens.xy; float be = max(length(d), 1.0);
+    float ue = max(be / uLens.z, 0.03), rt = sqrt(ue * ue + 4.0), A = (ue * ue + 2.0) / (2.0 * ue * rt);
+    bool sec = (gl_InstanceID & 1) == 1;
+    c = uLens.xy + d / be * (uLens.z * 0.5 * (sec ? ue - rt : ue + rt));
+    imul *= clamp(sec ? A - 0.5 : A + 0.5, 0.0, 6.0);           // magnification
+  }
   float ph = aParam.y;
   float tw = 1.0 + uTwinkle * aParam.z * (0.6 * sin(uTime * (1.3 + 1.7 * fract(ph * 7.13)) + ph * 6.2831)
                                         + 0.4 * sin(uTime * (3.1 + 2.3 * fract(ph * 3.7)) + ph * 17.0));
@@ -99,7 +107,7 @@ void main() {
   if (!vs || !fs) { canvas.remove(); return; }
   const prog = gl.createProgram(); gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
   if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { console.error(gl.getProgramInfoLog(prog)); canvas.remove(); return; }
-  const U = {}; ['uView', 'uCam', 'uTime', 'uTwinkle', 'uSpikeMode', 'uPsf', 'uHalo', 'uGain'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
+  const U = {}; ['uView', 'uCam', 'uTime', 'uTwinkle', 'uSpikeMode', 'uPsf', 'uHalo', 'uGain', 'uLens'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
 
   const F = 9, vao = gl.createVertexArray(), buf = gl.createBuffer(), corner = gl.createBuffer();
   gl.bindVertexArray(vao);
@@ -173,7 +181,11 @@ void main() {
     gl.uniform1f(U.uTwinkle, CFG.twinkle && !reduce ? 1 : 0);
     gl.uniform1f(U.uSpikeMode, CFG.spikes);
     gl.uniform1f(U.uPsf, CFG.psfSize); gl.uniform1f(U.uHalo, CFG.halo); gl.uniform1f(U.uGain, CFG.brightness);
-    gl.bindVertexArray(vao); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, count); gl.bindVertexArray(null);
+    const L = window.SKY_LENS, lens = !!(L && L.on && L.r > 2);   // set by the hero's black hole model
+    gl.uniform4f(U.uLens, lens ? L.x : 0, lens ? L.y : 0, lens ? L.r : 1, lens ? 1 : 0);
+    gl.bindVertexArray(vao);
+    for (let a = 0; a < 3; a++) gl.vertexAttribDivisor(1 + a, lens ? 2 : 1);
+    gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, lens ? count * 2 : count); gl.bindVertexArray(null);
   }
   let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(build, 150); });
   build();

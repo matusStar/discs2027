@@ -1,6 +1,8 @@
 /* hero-config.js: every setting for the 3D hero in one place. Edit values freely. */
 export const HERO = {
-  models: ['debris', 'dvd', 'vinyl', 'system', 'galaxy'],  // order shown; delete / reorder / add names from hero-models.js
+  models: ['debris', 'dvd', 'vinyl', 'system', 'blackhole'],  // order shown; delete / reorder / add names from hero-models.js
+  skyLens: true,       // black hole bends the background stars (false = off)
+  bhRes: 384,          // black hole ray-trace resolution (lower = faster start-up)
   hold: 6,             // seconds each model stays
   transition: 1.4,     // seconds to shrink one model and grow the next
   inner: 1.2,          // empty space around the star: inner radius of every disc (0.7 tight, 2 wide)

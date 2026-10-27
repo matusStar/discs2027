@@ -38,14 +38,14 @@ function start(host) {
 
   const star = createStar(T, cfg, uScale); scene.add(star.object);
 
-  const ctx = { T, cfg, uScale, R: 4.6, inner: cfg.inner }, cache = {};
+  const ctx = { T, cfg, uScale, R: 4.6, inner: cfg.inner, cam }, cache = {};
   const keys = cfg.models.filter(k => MODELS[k]);
   const get = k => cache[k] || (cache[k] = MODELS[k](ctx));
-  let idx = 0, active = get(keys[0]); tilt.add(active.group); label.textContent = active.name;
+  let idx = 0, active = get(keys[0]); tilt.add(active.group); label.textContent = active.name; star.object.visible = !active.hideStar;
   let phase = 'hold', pt = 0, nextIdx = 0, scaleK = 1;
 
   function swapTo(i) {
-    tilt.remove(active.group); idx = i; active = get(keys[i]); active.group.scale.setScalar(1); tilt.add(active.group); label.textContent = active.name;
+    tilt.remove(active.group); idx = i; active = get(keys[i]); active.group.scale.setScalar(1); tilt.add(active.group); label.textContent = active.name; star.object.visible = !active.hideStar;
   }
   function resize() {
     const w = host.clientWidth || 1, h = host.clientHeight || 1, dpr = Math.min(devicePixelRatio || 1, 2);
@@ -62,7 +62,8 @@ function start(host) {
   let raf = 0, last = performance.now(), time = 0;
   function frame(now) {
     raf = requestAnimationFrame(frame);
-    if (!visible || document.hidden) { last = now; return; }
+    const L = window.SKY_LENS = window.SKY_LENS || {};
+    if (!visible || document.hidden) { L.on = false; last = now; return; }
     const dt = Math.min((now - last) / 1000, 0.1); last = now; time += dt;
     star.update(time, dt); active.update(time, dt);
     if (keys.length > 1) {
@@ -73,12 +74,17 @@ function start(host) {
       active.group.scale.setScalar(Math.max(scaleK, 0.001));
       active.group.rotation.y = (1 - scaleK) * 1.5;
     }
+    if (active.lens) {                                                    // tell sky.js where to bend the background stars
+      const rc = host.getBoundingClientRect(), pxu = host.clientHeight / (2 * Math.tan(cam.fov * Math.PI / 360)) / cam.position.length();
+      L.x = rc.left + rc.width / 2; L.y = rc.top + rc.height / 2; L.r = active.lens * scaleK * pxu; L.on = L.r > 2;
+    } else L.on = false;
     renderer.render(scene, cam);
   }
   if (reduced) { star.update(1, 0); active.update(1, 0); renderer.render(scene, cam); } else raf = requestAnimationFrame(frame);
 
   host.__hero = { show(i) { phase = 'hold'; pt = 0; scaleK = 1; swapTo(i % keys.length); }, star };   // handy for testing in the console
   return () => {
+    if (window.SKY_LENS) window.SKY_LENS.on = false;
     cancelAnimationFrame(raf); ro.disconnect(); io.disconnect();
     scene.traverse(o => { o.geometry && o.geometry.dispose(); const m = o.material; (Array.isArray(m) ? m : m ? [m] : []).forEach(x => { for (const k in x) x[k] && x[k].isTexture && x[k].dispose(); x.dispose(); }); });
     scene.environment && scene.environment.dispose(); renderer.dispose();

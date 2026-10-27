@@ -1,5 +1,6 @@
 /* hero-models.js: the things that orbit the star. Each model is a function  (ctx) => ({ name, group, update(t, dt) }).
-   ctx = { T (three.js), cfg (hero-config), uScale (shared uniform), R (outer radius ~4.6), inner (hole radius, from cfg.inner) }.
+   ctx = { T (three.js), cfg (hero-config), uScale (shared uniform), R (outer radius ~4.6), inner (hole radius, from cfg.inner), cam }.
+   A model may also return hideStar: true (no central star) and lens: <Einstein radius in world units> (lenses the sky stars).
    To add a model: write a function, add it to MODELS at the bottom, then put its key in `models` in hero-config.js.
    Models can be points, meshes or anything three.js can draw; the star sits at (0,0,0) and the hole in a disc should be >= 0.6. */
 
@@ -187,17 +188,102 @@ function system(ctx) {
   } };
 }
 
-/* ---------- 5. Spiral galaxy (points) ---------- */
-function galaxy(ctx) {
-  const { T } = ctx, g = new T.Group(), r0 = Math.max(0.3, ctx.inner - 0.2);
-  const cloud = pointCloud(ctx, rng => {
-    if (rng() < 0.16 && ctx.inner < 0.9) return { p: [gauss(rng) * .4, gauss(rng) * .25, gauss(rng) * .4], c: [1, .85, .55].map(v => v * (.6 + rng() * .4)) };
-    const r = r0 + (5.2 - r0) * Math.pow(rng(), 0.7), arm = rng() < .5 ? 0 : Math.PI, a = arm + r * .85 + gauss(rng) * (.25 + .04 * r), t = r / 5.2;
-    let c = lerp3([1, .82, .5], [.45, .62, 1], t).map(v => v * (.5 + rng() * .5)); if (rng() < .05) c = [1, .35, .6];
-    return { p: [r * Math.cos(a), gauss(rng) * .09 * (1.2 - t), r * Math.sin(a)], c };
-  }, 1, 77);
-  g.add(cloud.pts); const h = haze(ctx, 6.4, [.45, .6, 1], .9); if (h) g.add(h);
-  return { name: 'Spiral galaxy', group: g, update: t => cloud.update(t) };
+/* ---------- 5. Black hole with an accretion disc (ray-traced Schwarzschild lensing) ----------
+   At start-up, light rays are traced backwards from the camera through the curved space around the hole (units: G=M=c=1).
+   The result (where each pixel hits the disc, and the Doppler boost there) is stored in two textures, so drawing is cheap.
+   The model also tells the sky to lens the real background stars (see SKY_LENS in sky.js). */
+function blackhole(ctx) {
+  const { T, cfg } = ctx, S = cfg.bhRes || 384, Mw = 0.22, Wd = 5.2, Bmax = Wd / Mw, D = 50, RIN = 6, ROUT = 22, DP = 0.04;
+  const el = cfg.tilt + Math.atan2(1.5, cfg.cameraZ), sE = Math.sin(el), cE = Math.cos(el);
+  const A = new Float32Array(S * S * 4), B = new Float32Array(S * S * 4), cdp = Math.cos(DP), sdp = Math.sin(DP);
+  function row(j) {
+    for (let i = 0; i < S; i++) {
+      const X = ((i + .5) / S * 2 - 1) * Bmax, Y = ((j + .5) / S * 2 - 1) * Bmax, b = Math.max(Math.hypot(X, Y), 1e-3);
+      const e2x = X / b, e2y = Y * cE / b, e2z = -Y * sE / b;                      // image-plane direction in the hole's frame; e1 = (0, sE, cE)
+      let u = 1 / D, up = Math.sqrt(Math.max(0, 1 / (b * b) - u * u * (1 - 2 * u))), ph = 0, c = 1, s = 0, n = 0;
+      const o = (j * S + i) * 4;
+      for (let k = 0; k < 400 && ph < 11.3; k++) {
+        const um = u + 0.5 * DP * up, upm = up + 0.5 * DP * (-u + 3 * u * u);
+        const u1 = u + DP * upm, up1 = up + DP * (-um + 3 * um * um);
+        if (u1 > 0.5) break;                                                        // fell into the hole
+        const c1 = c * cdp - s * sdp, s1 = s * cdp + c * sdp;
+        const d0 = c * sE + s * e2y, d1 = c1 * sE + s1 * e2y;                       // height above the disc plane before / after
+        if (d0 * d1 < 0 && n < 2) {
+          const f = d0 / (d0 - d1), uh = u + f * (u1 - u), r = 1 / uh;
+          if (r > RIN && r < ROUT) {
+            const ch = c + f * (c1 - c), sh = s + f * (s1 - s), nn = Math.hypot(ch, sh);
+            const cc = ch / nn, ss = sh / nn;
+            const px = r * ss * e2x, pz = r * (cc * cE + ss * e2z), phi = Math.atan2(pz, px);
+            const dr = -(up + f * (up1 - up)) / (uh * uh);                           // photon direction (traced ray points away from the observer)
+            const dx = dr * ss * e2x + r * (cc * e2x), dy = dr * (cc * sE + ss * e2y) + r * (-ss * sE + cc * e2y), dz = dr * (cc * cE + ss * e2z) + r * (-ss * cE + cc * e2z);
+            const dl = Math.hypot(dx, dy, dz), nx = -dx / dl, nz = -dz / dl;
+            const vl = Math.sqrt(1 / (r - 2)), vx = -pz / r * vl, vz = px / r * vl;  // disc matter moves counter-clockwise
+            const g = Math.sqrt(1 - 2 / r) * Math.sqrt(1 - vl * vl) / (1 - (vx * nx + vz * nz));
+            const arr = n === 0 ? A : B; arr[o] = r; arr[o + 1] = Math.cos(phi); arr[o + 2] = Math.sin(phi); arr[o + 3] = g; n++;
+          }
+        }
+        u = u1; up = up1; c = c1; s = s1; ph += DP;
+        if (up < 0 && u < 1 / (ROUT * 1.2)) break;                                  // escaped to infinity
+      }
+    }
+  }
+  const mk = d => { const t = new T.DataTexture(d, S, S, T.RGBAFormat, T.FloatType); t.minFilter = t.magFilter = T.NearestFilter; return t; };
+  const tA = mk(A), tB = mk(B);
+  const mat = new T.ShaderMaterial({ transparent: true, premultipliedAlpha: true, depthWrite: false, depthTest: false, side: T.DoubleSide,
+    uniforms: { tA: { value: tA }, tB: { value: tB }, uTime: { value: 0 } },
+    vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position, 1.); }`,
+    fragmentShader: `uniform sampler2D tA, tB; uniform float uTime; varying vec2 vUv;
+const float RIN = ${RIN.toFixed(1)}, BMAX = ${Bmax.toFixed(3)}, TS = ${S.toFixed(1)};
+float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7)))*43758.5453); }
+float n2(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f); return mix(mix(h(i), h(i+vec2(1,0)), f.x), mix(h(i+vec2(0,1)), h(i+vec2(1,1)), f.x), f.y); }
+vec3 ramp(float t){
+  vec3 c = mix(vec3(.45,.07,.02), vec3(1.,.42,.1), smoothstep(0., .5, t));
+  c = mix(c, vec3(1.,.82,.55), smoothstep(.4, 1., t));
+  return mix(c, vec3(.8,.9,1.), smoothstep(.95, 1.7, t));
+}
+vec3 disc(vec4 q){
+  if (q.x < 1.) return vec3(0.);
+  float r = q.x, g = q.w, x = RIN / r;
+  float ang = atan(q.z, q.y) - uTime*6./pow(r, 1.5);                              // matter orbits faster on the inside
+  vec2 pc = vec2(cos(ang), sin(ang)); float lr = log(r);                           // noise on (cos, sin) so it has no seam at +-180 degrees
+  float turb = .55 + .45*n2(pc*2.2 + vec2(lr*9., lr*5.)) + .25*(n2(pc*5.5 + vec2(lr*26., 3.)) - .5);
+  float inten = 8.*pow(x, 2.4)*(.3 + .7*(1. - sqrt(x))) * turb;
+  float Tm = pow(x, .75)*g;
+  return ramp(Tm) * inten * pow(clamp(g, .15, 2.2), 3.);                          // relativistic beaming: the approaching side is brighter
+}
+vec4 samp(sampler2D t, vec2 uv, out float cov){                                   // bilinear, but only between texels that hit the disc
+  vec2 p = uv*TS - .5, i = floor(p), f = fract(p);
+  vec4 s00 = texture2D(t, (i + .5)/TS), s10 = texture2D(t, (i + vec2(1.5, .5))/TS), s01 = texture2D(t, (i + vec2(.5, 1.5))/TS), s11 = texture2D(t, (i + 1.5)/TS);
+  float w00 = (1.-f.x)*(1.-f.y)*step(1., s00.x), w10 = f.x*(1.-f.y)*step(1., s10.x), w01 = (1.-f.x)*f.y*step(1., s01.x), w11 = f.x*f.y*step(1., s11.x);
+  cov = w00 + w10 + w01 + w11;
+  return (s00*w00 + s10*w10 + s01*w01 + s11*w11)/max(cov, 1e-4);
+}
+void main(){
+  float k1, k2; vec4 a = samp(tA, vUv, k1), b = samp(tB, vUv, k2);
+  vec3 c1 = disc(a)*k1, c2 = disc(b)*k2;
+  float a1 = clamp(max(c1.r, max(c1.g, c1.b))*1.4, 0., 1.);
+  vec3 col = c1 + (1. - a1)*c2;
+  float bb = length(vUv*2. - 1.)*BMAX;
+  col += (1. - a1)*vec3(1., .75, .5)*.3*exp(-pow((bb - 5.45)/.22, 2.));                    // photon ring
+  float shadow = 1. - smoothstep(5.14, 5.26, bb);                                  // rays that fall in: black, unless the disc is in front
+  float al = clamp(max(col.r, max(col.g, col.b)), 0., 1.);
+  al = max(al, shadow);
+  col = min(col, vec3(al)) ;
+  col = 1. - exp(-col*1.6);                                                        // soft highlight roll-off
+  col = min(col, vec3(al));
+  gl_FragColor = vec4(col, al);
+}` });
+  const mesh = new T.Mesh(new T.PlaneGeometry(Wd * 2, Wd * 2), mat); mesh.visible = false; mesh.frustumCulled = false;
+  const g = new T.Group(); g.add(mesh);
+  let r = 0, ready = false; const q = new T.Quaternion();
+  return { name: 'Black hole', group: g, hideStar: true, lens: cfg.skyLens ? 7.7 * Mw : 0, update(t) {
+    if (!ready) {
+      const t0 = performance.now(); while (r < S && performance.now() - t0 < 7) row(r++);
+      if (r >= S) { tA.needsUpdate = tB.needsUpdate = true; ready = true; mesh.visible = true; }
+    }
+    mesh.parent.getWorldQuaternion(q); mesh.quaternion.copy(q.invert()).multiply(ctx.cam.quaternion);   // always faces the camera
+    mat.uniforms.uTime.value = t;
+  } };
 }
 
-export const MODELS = { debris, dvd, vinyl, system, galaxy };
+export const MODELS = { debris, dvd, vinyl, system, blackhole };
