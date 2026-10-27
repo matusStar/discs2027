@@ -9,7 +9,13 @@
     seed: 2027,      // same seed = same sky on every page load
     spikes: 2,       // 0 none, 1 classic (+), 2 JWST-style (6)
     twinkle: true,
-    parallax: true
+    parallax: true,
+    psfSize: 1,      // size of every star's glow and spikes (1 = default, 0.6 smaller, 1.5 bigger)
+    halo: 1,         // strength of the wide faint halo around bright stars
+    brightness: 1,   // overall star brightness
+    blue: 0,         // 0..1 extra share of hot blue-white stars
+    warm: 0,         // 0..1 extra share of orange/red stars
+    purple: 0.06     // 0..1 share of stars tinted purple/violet
   }, window.SKY_CONFIG || {});
 
   if (document.getElementById('sky-bg')) return;
@@ -29,7 +35,7 @@ layout(location=1) in vec3 aPos;     // x,y in 0..1 across the screen, depth 0.3
 layout(location=2) in vec3 aColor;
 layout(location=3) in vec3 aParam;   // brightness, phase, twinkle amount
 uniform vec2 uView, uCam;
-uniform float uTime, uTwinkle, uSpikeMode;
+uniform float uTime, uTwinkle, uSpikeMode, uPsf, uHalo;
 flat out vec3 vColor; flat out vec4 vP; flat out vec3 vQ; flat out float vI;
 out vec2 vS;
 void main() {
@@ -43,11 +49,11 @@ void main() {
   float ph = aParam.y;
   float tw = 1.0 + uTwinkle * aParam.z * (0.6 * sin(uTime * (1.3 + 1.7 * fract(ph * 7.13)) + ph * 6.2831)
                                         + 0.4 * sin(uTime * (3.1 + 2.3 * fract(ph * 3.7)) + ph * 17.0));
-  float s0 = (0.55 + 0.95 * sqrt(b)) * pow(sc, 0.5);
-  float s1 = (1.4 + 15.0 * pow(b, 1.2)) * sc;
+  float s0 = (0.55 + 0.95 * sqrt(b)) * pow(sc, 0.5) * uPsf;
+  float s1 = (1.4 + 15.0 * pow(b, 1.2)) * sc * uPsf;
   float a0 = 0.22 + 1.1 * b;
-  float a1 = 0.04 + 0.95 * b * b;
-  float Ls = (12.0 + 62.0 * b) * pow(sc, 0.6);
+  float a1 = (0.04 + 0.95 * b * b) * uHalo;
+  float Ls = (12.0 + 62.0 * b) * pow(sc, 0.6) * uPsf;
   float sa = (uSpikeMode > 0.5) ? smoothstep(0.66, 0.97, b) : 0.0;
   float ext = 5.0 * s1;
   if (sa > 0.0) ext = max(ext, 1.9 * Ls);
@@ -62,7 +68,7 @@ void main() {
 precision highp float;
 flat in vec3 vColor; flat in vec4 vP; flat in vec3 vQ; flat in float vI;
 in vec2 vS;
-uniform float uSpikeMode;
+uniform float uSpikeMode, uGain;
 out vec4 o;
 float spikeLine(vec2 p, float ang, float w, float Ls, float len) {
   vec2 d = vec2(cos(ang), sin(ang));
@@ -80,7 +86,7 @@ void main() {
     I += vQ.y * 0.85 * sp;
   }
   I *= smoothstep(0.0, vQ.z * 0.35, vQ.z - max(abs(vS.x), abs(vS.y)));
-  I *= vI;
+  I *= vI * uGain;
   vec3 c = vColor * I;
   c = mix(c, vec3(1.0, 0.97, 0.93) * I, smoothstep(0.8, 3.0, I) * 0.75);   // saturated cores go white
   c = 1.0 - exp(-c * 1.25);
@@ -93,7 +99,7 @@ void main() {
   if (!vs || !fs) { canvas.remove(); return; }
   const prog = gl.createProgram(); gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
   if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { console.error(gl.getProgramInfoLog(prog)); canvas.remove(); return; }
-  const U = {}; ['uView', 'uCam', 'uTime', 'uTwinkle', 'uSpikeMode'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
+  const U = {}; ['uView', 'uCam', 'uTime', 'uTwinkle', 'uSpikeMode', 'uPsf', 'uHalo', 'uGain'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
 
   const F = 9, vao = gl.createVertexArray(), buf = gl.createBuffer(), corner = gl.createBuffer();
   gl.bindVertexArray(vao);
@@ -138,7 +144,11 @@ void main() {
       let x, y;
       if (rand() < 0.38) { x = rand(); y = 0.62 - 0.3 * x + gauss() * 0.07; } else { x = rand(); y = rand(); }   // faint Milky Way band
       const b = Math.min(1, -Math.log2(1 - rand()) / 10.5);
-      const col = blackbody(temperature(b)), o = i * F;
+      const u = rand();
+      const T = u < CFG.blue ? rnd(9000, 26000) : u < CFG.blue + CFG.warm ? rnd(2800, 4800) : temperature(b);
+      let col = blackbody(T);
+      if (rand() < CFG.purple) col = col.map((v, k) => v * 0.3 + [0.75, 0.45, 1][k] * 0.7);   // violet tint
+      const o = i * F;
       data.set([x, y - Math.floor(y), rnd(0.3, 1), col[0], col[1], col[2], b, rand(), 0.42 * Math.pow(1 - b, 3) + 0.06], o);
     }
     gl.bindBuffer(gl.ARRAY_BUFFER, buf); gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
@@ -162,6 +172,7 @@ void main() {
     gl.uniform1f(U.uTime, now % 1000);
     gl.uniform1f(U.uTwinkle, CFG.twinkle && !reduce ? 1 : 0);
     gl.uniform1f(U.uSpikeMode, CFG.spikes);
+    gl.uniform1f(U.uPsf, CFG.psfSize); gl.uniform1f(U.uHalo, CFG.halo); gl.uniform1f(U.uGain, CFG.brightness);
     gl.bindVertexArray(vao); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, count); gl.bindVertexArray(null);
   }
   let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(build, 150); });

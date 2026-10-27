@@ -5247,35 +5247,54 @@ body {
     height: 1px !important;
   }
 }
+/* ================= SETTINGS: edit these ================= */
+:root {
+  /* text box */
+  --box-bg: rgba(6, 6, 6, 0.78); /* last number = opacity (0 clear .. 1 solid) */
+  --box-blur: 8px;
+  --box-border: rgba(160, 180, 255, .12);
+  --box-radius: 18px;
+  --box-shadow: 0 30px 80px rgba(0, 0, 0, .45);
+  /* sky colours. The two nebulae are "off" while they equal the base colour:
+     set e.g. --nebula-blue: #101a3d; --nebula-purple: #1a0f33; to switch them on */
+  --sky-base: #010206;
+  --nebula-blue: #010206;
+  --nebula-purple: #010206;
+  /* header and hero */
+  --bar-bg: rgba(3, 5, 13, .6);
+  --hero-height: clamp(380px, 60vh, 600px);
+  --hero-label-opacity: 0; /* 0 hides the model name, .75 shows it */
+}
+
 /* ---- starry background: page itself must be transparent so the canvas shows ---- */
 html {
-  background: #010206;
+  background: radial-gradient(1100px 700px at 72% 18%, var(--nebula-blue) 0%, transparent 62%) fixed, radial-gradient(900px 700px at 10% 88%, var(--nebula-purple) 0%, transparent 62%) fixed, var(--sky-base);
 }
 
 body {
   background: transparent;
 }
 
-.masthead, .page__footer {
-  background: rgba(3, 5, 13, 0.6);
+.page__footer {
+  background: var(--bar-bg);
 }
 
 /* ---- translucent text box around the page text only ---- */
 .page__inner-wrap, .splash .page__content {
-  background: rgba(8, 12, 30, 0.78);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(160, 180, 255, 0.12);
-  border-radius: 18px;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+  background: var(--box-bg);
+  -webkit-backdrop-filter: blur(var(--box-blur));
+  backdrop-filter: blur(var(--box-blur));
+  border: 1px solid var(--box-border);
+  border-radius: var(--box-radius);
+  box-shadow: var(--box-shadow);
   padding: 1.5rem 2rem 2rem;
   margin-bottom: 2rem;
 }
 
-/* clean header */
+/* ---- clean header ---- */
 .masthead {
   background: transparent;
-  border-bottom: 1px solid rgba(160, 180, 255, 0.12);
+  border-bottom: 1px solid var(--box-border);
 }
 
 .masthead__inner-wrap {
@@ -5312,10 +5331,13 @@ body {
   background: transparent;
 }
 
+/* ---- 3D hero (above the text box) ---- */
 #hero3d {
   position: relative;
-  height: clamp(600px, 60vh, 560px);
-  margin: 0 0 1.5rem;
+  z-index: 2;
+  height: var(--hero-height);
+  max-width: 1000px;
+  margin: 0 auto 2rem;
 }
 
 .hero3d__label {
@@ -5326,24 +5348,12 @@ body {
   text-align: center;
   font-size: 0.85rem;
   letter-spacing: 0.08em;
-  opacity: 0;
+  opacity: var(--hero-label-opacity);
   transition: opacity 0.6s;
 }
 
 .hero3d__label.is-fading {
   opacity: 0;
-}
-
-#hero3d {
-  position: relative;
-  z-index: 2;
-  margin-bottom: 2rem;
-}
-
-#hero3d {
-  max-width: 1000px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 /*# sourceMappingURL=main.css.map */
