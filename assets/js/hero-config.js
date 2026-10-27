@@ -1,8 +1,9 @@
 /* hero-config.js: every setting for the 3D hero in one place. Edit values freely. */
 export const HERO = {
   models: ['debris', 'dvd', 'vinyl', 'system', 'blackhole',
-           'belt', 'horseshoe', 'comets', 'circumbinary', 'jet', 'pizza', 'dartboard', 'ufo', 'cymbal'],   // order shown; delete / reorder freely
+           'belt', 'comets', 'circumbinary', 'pizza', 'dartboard', 'ufo', 'cymbal'],   // order shown; delete / reorder freely
   skyLens: true,       // black hole bends the background stars (false = off)
+  bhBright: 1.6,       // brightness of the black hole's disc and dust (1 = old, 2 = much brighter)
   bhRes: 512,          // black hole ray-trace resolution (lower = faster start-up, 384 is fine too)
   hold: 6,             // seconds each model stays
   transition: 1.4,     // seconds to shrink one model and grow the next

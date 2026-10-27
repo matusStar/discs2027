@@ -5251,7 +5251,7 @@ body {
 :root {
   /* text box */
   --box-width: 900px; /* 700px narrower, 1100px wider, 100% full */
-  --box-bg: rgba(8, 12, 30, .78); /* last number = opacity (0 clear .. 1 solid) */
+  --box-bg: rgba(18, 19, 19, 0.78); /* last number = opacity (0 clear .. 1 solid) */
   --box-blur: 8px;
   --box-border: rgba(160, 180, 255, .12);
   --box-radius: 18px;

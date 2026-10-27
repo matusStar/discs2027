@@ -88,16 +88,23 @@ function dvd(ctx) {
   const prof = [[hole, -th], [R, -th], [R, th], [hole, th], [hole, -th]].map(p => new T.Vector2(p[0], p[1]));
   const body = new T.Mesh(new T.LatheGeometry(prof, 160), new T.MeshStandardMaterial({ color: 0xcfd3dc, metalness: 1, roughness: .2, side: T.DoubleSide, envMapIntensity: ctx.cfg.envIntensity }));
   const data = new T.Mesh(flat(T, new T.RingGeometry(dataR, R - 0.12, 200, 1)), new T.ShaderMaterial({
-    vertexShader: `varying vec3 vW; varying vec2 vL; void main(){ vL = position.xy; vec4 w = modelMatrix*vec4(position,1.); vW = w.xyz; gl_Position = projectionMatrix*viewMatrix*w; }`,
-    fragmentShader: `varying vec3 vW; varying vec2 vL;
+    uniforms: { uTime: { value: 0 } },
+    vertexShader: `varying vec3 vW; varying vec2 vL; void main(){ vL = position.xz; vec4 w = modelMatrix*vec4(position,1.); vW = w.xyz; gl_Position = projectionMatrix*viewMatrix*w; }`,
+    fragmentShader: `varying vec3 vW; varying vec2 vL; uniform float uTime;
+vec3 spec(float x){ return .5 + .5*cos(6.2831*(x + vec3(0., .33, .67))); }
+float wrap(float d){ return d - 6.2831*floor((d + 3.1416)/6.2831); }
 void main(){
-  float r = length(vL), a = atan(vW.z, vW.x);
+  float r = length(vL), a = atan(vL.y, vL.x);
   vec3 V = normalize(cameraPosition - vW);
-  float t = r*.21 + a*.32 + V.x*.9 + V.z*.6;
-  vec3 rain = .55 + .45*cos(6.2831*(t + vec3(0., .33, .67)));
-  float sheen = .5 + .5*pow(abs(cos(a + V.x*2.)), 2.);
-  float track = .9 + .1*sin(r*260.);
-  gl_FragColor = vec4(rain*sheen*track*1.05 + .06, 1.);
+  float th = .9 + V.x*1.4 + V.z*.6;                         // where the two light fans point: they sweep as the disc sways
+  float d1 = wrap(a - th), d2 = wrap(a - th - 3.1416);
+  float dd = abs(d1) < abs(d2) ? d1 : d2;                   // angle to the nearest fan axis
+  float side = .5 + .5*cos(2.*(a - th));                    // 1 on the fan axes, 0 at 90 degrees
+  vec3 col = mix(vec3(.16, .08, .10), vec3(.14, .18, .55), smoothstep(.1, .9, side));   // deep blue-violet, browner away from the fans
+  col += spec(.55 + dd*1.25)*exp(-pow(dd/.42, 2.))*.95;     // radial rainbow fan: cyan, green, yellow, pink
+  col += vec3(.25, .3, 1.)*exp(-pow((abs(dd) - 1.)/.07, 2.))*.7;   // thin bright blue streaks
+  col *= (.8 + .2*smoothstep(1.7, 4.4, r))*(.93 + .07*sin(r*260.));
+  gl_FragColor = vec4(col, 1.);
 }` }));
   data.position.y = th + 0.002;
   const hub = new T.Mesh(flat(T, new T.RingGeometry(hole, hubR, 96, 1)), new T.MeshPhysicalMaterial({ color: 0xb4c0d2, roughness: .08, metalness: 0, transparent: true, opacity: .55, side: T.DoubleSide, envMapIntensity: ctx.cfg.envIntensity }));
@@ -106,7 +113,7 @@ void main(){
   ring.position.y = th + 0.002;
   g.add(body, data, hub, ring);
   const outer = new T.Group(); outer.add(g); const h = haze(ctx, 6, [.6, .75, 1], .8); if (h) outer.add(h);
-  return { name: 'DVD', group: outer, update(t) { g.rotation.x = 0.12 * Math.sin(t * 0.4); g.rotation.z = 0.1 * Math.sin(t * 0.31 + 1); } };
+  return { name: 'DVD', group: outer, update(t) { data.material.uniforms.uTime.value = t; g.rotation.x = 0.12 * Math.sin(t * 0.4); g.rotation.z = 0.1 * Math.sin(t * 0.31 + 1); } };
 }
 
 /* ---------- 3. Vinyl record (grooves, clear-coat, printed label, light streak) ---------- */
@@ -130,7 +137,7 @@ function vinyl(ctx) {
   label.position.y = th + 0.003;
   spin.add(body, grooves, label);
   const streak = new T.Mesh(flat(T, new T.RingGeometry(lab, top, 200, 1)), new T.ShaderMaterial({ transparent: true, depthWrite: false, blending: T.AdditiveBlending,
-    vertexShader: `varying vec3 vW; varying vec2 vL; void main(){ vL = position.xy; vec4 w = modelMatrix*vec4(position,1.); vW = w.xyz; gl_Position = projectionMatrix*viewMatrix*w; }`,
+    vertexShader: `varying vec3 vW; varying vec2 vL; void main(){ vL = position.xz; vec4 w = modelMatrix*vec4(position,1.); vW = w.xyz; gl_Position = projectionMatrix*viewMatrix*w; }`,
     fragmentShader: `varying vec3 vW; varying vec2 vL;
 void main(){ float r = length(vL), a = atan(vW.z, vW.x);
   float s = pow(abs(cos(2.*a - .9)), 18.)*.55 + pow(abs(cos(2.*a + 1.9)), 30.)*.25;
@@ -230,9 +237,9 @@ function blackhole(ctx) {
   const mk = d => { const t = new T.DataTexture(d, S, S, T.RGBAFormat, T.FloatType); t.minFilter = t.magFilter = T.NearestFilter; return t; };
   const tA = mk(A), tB = mk(B);
   const mat = new T.ShaderMaterial({ transparent: true, premultipliedAlpha: true, depthWrite: false, depthTest: false, side: T.DoubleSide,
-    uniforms: { tA: { value: tA }, tB: { value: tB }, uTime: { value: 0 } },
+    uniforms: { tA: { value: tA }, tB: { value: tB }, uTime: { value: 0 }, uBright: { value: cfg.bhBright || 1.6 } },
     vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position, 1.); }`,
-    fragmentShader: `uniform sampler2D tA, tB; uniform float uTime; varying vec2 vUv;
+    fragmentShader: `uniform sampler2D tA, tB; uniform float uTime, uBright; varying vec2 vUv;
 const float RIN = ${RIN.toFixed(1)}, BMAX = ${Bmax.toFixed(3)}, ROUT = ${ROUT.toFixed(1)}, TS = ${S.toFixed(1)};
 float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7)))*43758.5453); }
 float n2(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f); return mix(mix(h(i), h(i+vec2(1,0)), f.x), mix(h(i+vec2(0,1)), h(i+vec2(1,1)), f.x), f.y); }
@@ -247,7 +254,7 @@ vec3 disc(vec4 q){
   float ang = atan(q.z, q.y) - uTime*6./pow(r, 1.5);                              // matter orbits faster on the inside
   vec2 pc = vec2(cos(ang), sin(ang)); float lr = log(r);                           // noise on (cos, sin) so it has no seam at +-180 degrees
   float turb = .55 + .45*n2(pc*2.2 + vec2(lr*9., lr*5.)) + .25*(n2(pc*5.5 + vec2(lr*26., 3.)) - .5);
-  float inten = 8.*pow(x, 2.4)*(.3 + .7*(1. - sqrt(x))) * turb;
+  float inten = uBright*8.*pow(x, 1.9)*(.3 + .7*(1. - sqrt(x))) * turb;
   float Tm = pow(x, .75)*g;
   float edge = smoothstep(ROUT, ROUT*.5, r + (turb - .5)*9.) * smoothstep(RIN, RIN*1.06, r);   // dusty, ragged outer edge; soft inner edge
   return ramp(Tm) * inten * edge * pow(clamp(g, .15, 2.2), 3.);                          // relativistic beaming: the approaching side is brighter
@@ -288,6 +295,8 @@ void main(){
 }
 
 /* ================= more models ================= */
+/* the engine sets rotation.y of a model's top group during transitions, so models that spin themselves spin an inner group */
+const wrapGroup = (T, g) => { const o = new T.Group(); o.add(g); return o; };
 const kw = r => 1.4 / (0.6 + Math.pow(r, 1.5));                     // same orbital speed as the particle shader
 const cosTex = (ctx, w, h, fn) => canvasTex(ctx, w, h, fn);
 
@@ -446,7 +455,7 @@ function pizza(ctx) {
   const sauce = new T.Mesh(flat(T, new T.RingGeometry(hole, rim, 128, 1)), new T.MeshStandardMaterial({ map: top, roughness: .55, envMapIntensity: .5 })); sauce.position.y = th + .002;
   const crust = new T.Mesh(new T.TorusGeometry(rim, .2, 20, 128), new T.MeshStandardMaterial({ color: 0xc98a3c, roughness: .85, envMapIntensity: .2 })); crust.rotation.x = Math.PI / 2; crust.position.y = th * .6;
   g.add(body, sauce, crust);
-  return { name: 'Pizza', group: g, update(t) { g.rotation.y = t * .3; } };
+  return { name: 'Pizza', group: wrapGroup(T, g), update(t) { g.rotation.y = t * .3; } };
 }
 
 /* ---------- 12. Dartboard (the star is the bullseye) ---------- */
@@ -468,7 +477,7 @@ function dartboard(ctx) {
   const body = new T.Mesh(new T.LatheGeometry([[hole, -th], [rad, -th], [rad, th], [hole, th], [hole, -th]].map(p => new T.Vector2(...p)), 96), new T.MeshStandardMaterial({ color: 0x222222, roughness: .8, side: T.DoubleSide, envMapIntensity: .2 }));
   const face = new T.Mesh(flat(T, new T.RingGeometry(hole, rad, 160, 1)), new T.MeshStandardMaterial({ map: tex, roughness: .7, envMapIntensity: .3 })); face.position.y = th + .002;
   g.add(body, face);
-  return { name: 'Dartboard', group: g, update(t) { g.rotation.y = t * .25; } };
+  return { name: 'Dartboard', group: wrapGroup(T, g), update(t) { g.rotation.y = t * .25; } };
 }
 
 /* ---------- 13. UFO (a saucer ring with a glass band and chasing lights) ---------- */
@@ -483,7 +492,7 @@ function ufo(ctx) {
   const under = new T.Mesh(flat(T, new T.RingGeometry(hole + .3, rim - .5, 96, 1)), new T.MeshBasicMaterial({ color: 0x66ffcc, transparent: true, opacity: .16, blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide })); under.position.y = -.3;
   g.add(hull, glass, under); const h = haze(ctx, 6, [.4, 1, .8], .5); if (h) g.add(h);
   const cc = new T.Color();
-  return { name: 'UFO', group: g, update(t) {
+  return { name: 'UFO', group: wrapGroup(T, g), update(t) {
     lights.forEach((m, i) => { m.material.color.setHSL((i / N + t * .15) % 1, 1, .5 + .35 * Math.max(0, Math.sin(i / N * TAU * 3 - t * 5))); });
     g.rotation.y = t * .4; g.rotation.z = .06 * Math.sin(t * .8);
   } };
