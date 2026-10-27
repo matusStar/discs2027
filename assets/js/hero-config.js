@@ -1,6 +1,7 @@
 /* hero-config.js: every setting for the 3D hero in one place. Edit values freely. */
 export const HERO = {
-  models: ['debris', 'dvd', 'vinyl', 'system', 'blackhole'],  // order shown; delete / reorder / add names from hero-models.js
+  models: ['debris', 'dvd', 'vinyl', 'system', 'blackhole',
+           'belt', 'horseshoe', 'comets', 'circumbinary', 'jet', 'pizza', 'dartboard', 'ufo', 'cymbal'],   // order shown; delete / reorder freely
   skyLens: true,       // black hole bends the background stars (false = off)
   bhRes: 512,          // black hole ray-trace resolution (lower = faster start-up, 384 is fine too)
   hold: 6,             // seconds each model stays
@@ -17,10 +18,10 @@ export const HERO = {
   star: {
     radius: 0.3,
     glow: 8,         // size of the soft glow around the star
-    loops: 8,          // magnetic loops (max 8)
-    loopHeight: [0.01, 0.1],   // min/max loop height
+    loops: 6,          // magnetic loops (max 8)
+    loopHeight: [0.01, 0.2],   // min/max loop height
     loopLife: [5, 10],         // seconds a loop lives
-    cmeEvery: [6, 11],         // seconds between coronal mass ejections (min, max)
+    cmeEvery: [0, 0],         // seconds between coronal mass ejections (min, max)
     cmeLife: 0,                // seconds one ejection takes to fade
   },
 };

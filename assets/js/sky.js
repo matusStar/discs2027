@@ -15,7 +15,8 @@
     brightness: 1,   // overall star brightness
     blue: 0,         // 0..1 extra share of hot blue-white stars
     warm: 0,         // 0..1 extra share of orange/red stars
-    purple: 0.06     // 0..1 share of stars tinted purple/violet
+    purple: 0.06,    // 0..1 share of stars tinted purple/violet
+    maxDpr: 1.5      // cap on screen sharpness; lower = smoother on phones
   }, window.SKY_CONFIG || {});
 
   if (document.getElementById('sky-bg')) return;
@@ -23,10 +24,16 @@
   const canvas = document.createElement('canvas');
   canvas.id = 'sky-bg';
   canvas.setAttribute('aria-hidden', 'true');
-  canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:block';
+  canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;height:100lvh;z-index:-1;pointer-events:none;display:block';
   const gl = canvas.getContext('webgl2', { antialias: false, alpha: true, premultipliedAlpha: true, powerPreference: 'low-power' });
   if (!gl) return;                       // no WebGL2: the CSS gradient behind it still looks fine
   document.body.prepend(canvas);
+  /* phones: the browser's address bar slides in and out and changes window.innerHeight. We size everything to the
+     LARGEST viewport (100lvh) and ignore small height changes, so the sky is never rebuilt or rescaled while scrolling. */
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;top:0;left:0;width:0;height:100lvh;visibility:hidden;pointer-events:none';
+  document.body.appendChild(probe);
+  const viewH = () => Math.max(window.innerHeight, probe.offsetHeight || 0);
 
   const VERT = `#version 300 es
 precision highp float;
@@ -142,8 +149,8 @@ void main() {
   let VW = 0, VH = 0, count = 0;
   function build() {
     seed = CFG.seed >>> 0;
-    VW = document.documentElement.clientWidth; VH = window.innerHeight;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    VW = document.documentElement.clientWidth; VH = viewH();
+    const dpr = Math.min(window.devicePixelRatio || 1, CFG.maxDpr);
     canvas.width = Math.round(VW * dpr); canvas.height = Math.round(VH * dpr);
     gl.viewport(0, 0, canvas.width, canvas.height);
     count = Math.max(1500, Math.min(9000, Math.round(CFG.density * VW * VH / 1e6)));
@@ -187,7 +194,10 @@ void main() {
     for (let a = 0; a < 3; a++) gl.vertexAttribDivisor(1 + a, lens ? 2 : 1);
     gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, lens ? count * 2 : count); gl.bindVertexArray(null);
   }
-  let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(build, 150); });
+  let rz; addEventListener('resize', () => {
+    clearTimeout(rz);
+    rz = setTimeout(() => { if (Math.abs(document.documentElement.clientWidth - VW) > 1 || Math.abs(viewH() - VH) > 150) build(); }, 150);
+  });
   build();
   requestAnimationFrame(ts => { last = ts / 1000; draw(ts); });
 })();

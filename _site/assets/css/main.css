@@ -5250,7 +5250,8 @@ body {
 /* ================= SETTINGS: edit these ================= */
 :root {
   /* text box */
-  --box-bg: rgba(6, 6, 6, 0.78); /* last number = opacity (0 clear .. 1 solid) */
+  --box-width: 900px; /* 700px narrower, 1100px wider, 100% full */
+  --box-bg: rgba(8, 12, 30, .78); /* last number = opacity (0 clear .. 1 solid) */
   --box-blur: 8px;
   --box-border: rgba(160, 180, 255, .12);
   --box-radius: 18px;
@@ -5262,7 +5263,6 @@ body {
   --nebula-purple: #010206;
   /* header and hero */
   --bar-bg: rgba(3, 5, 13, .6);
-  --hero-height: clamp(380px, 60vh, 600px);
   --hero-label-opacity: 0; /* 0 hides the model name, .75 shows it */
 }
 
@@ -5279,18 +5279,40 @@ body {
   background: var(--bar-bg);
 }
 
-/* ---- translucent text box around the page text only ---- */
-.page__inner-wrap, .splash .page__content {
+/* ---- centred, translucent text box ---- */
+#main {
+  display: block;
+}
+
+.page {
+  float: none !important;
+  width: 100% !important;
+  padding-inline-end: 0 !important;
+  margin-inline: auto !important;
+}
+
+.page .page__inner-wrap,
+.splash .page__content {
+  float: none !important;
+  display: flow-root;
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: var(--box-width);
+  margin: 1em auto 2rem !important;
+  padding: 1.5rem 2rem 2rem;
   background: var(--box-bg);
   -webkit-backdrop-filter: blur(var(--box-blur));
   backdrop-filter: blur(var(--box-blur));
   border: 1px solid var(--box-border);
   border-radius: var(--box-radius);
   box-shadow: var(--box-shadow);
-  padding: 1.5rem 2rem 2rem;
-  margin-bottom: 2rem;
 }
 
+@media (max-width: 600px) {
+  .page .page__inner-wrap, .splash .page__content {
+    padding: 1rem 1.1rem 1.4rem;
+  }
+}
 /* ---- clean header ---- */
 .masthead {
   background: transparent;
@@ -5335,7 +5357,8 @@ body {
 #hero3d {
   position: relative;
   z-index: 2;
-  height: var(--hero-height);
+  height: clamp(380px, 60vh, 600px);
+  height: clamp(380px, 60lvh, 600px); /* phones: stays put when the address bar moves */
   max-width: 1000px;
   margin: 0 auto 2rem;
 }
