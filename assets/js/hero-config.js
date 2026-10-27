@@ -18,9 +18,9 @@ export const HERO = {
     radius: 0.3,
     glow: 8,         // size of the soft glow around the star
     loops: 8,          // magnetic loops (max 8)
-    loopHeight: [0.25, 0.6],   // min/max loop height
+    loopHeight: [0.01, 0.1],   // min/max loop height
     loopLife: [5, 10],         // seconds a loop lives
     cmeEvery: [6, 11],         // seconds between coronal mass ejections (min, max)
-    cmeLife: 6,                // seconds one ejection takes to fade
+    cmeLife: 0,                // seconds one ejection takes to fade
   },
 };
