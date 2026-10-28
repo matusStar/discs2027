@@ -32,8 +32,8 @@ For any queries, please email  [TBD](mailto:EMAIL).
 - Zoe Roumeliotis – TCD
 - Matúš Starčok – TCD
 - Oto Ulrich – TCD
-- Eoin Kenny, University of Galway
-- Chloe Lawlor, University of Galway
+- Eoin Kenny - University of Galway
+- Chloe Lawlor - University of Galway
 
 ## Important Dates
 - Registration and abstract submission opens: TBD              
