@@ -6,34 +6,30 @@ title: "About"
 
 _NOTE: This website is currently being updated for the 2027 conference. The information is not up to date_
 
-The UKI discs meeting aims to bring together different astrophysical disc communities across the UK & Ireland. We are delighted to announce the fourth meeting of [this series](https://ukidiscs.github.io/) will be hosted at the Trinity College Dublin on 5th-7th July 2027! The theme of the meeting will be _TBD_, covering observations and theory. Scientific topics include but are not limited to: protoplanetary discs, protosatellite discs, debris discs, disc formation and evolution, winds and jets, irradiated discs and proplyds, planet-disc interactions and migration, planet and planetesimal formation, exocomets, disc chemistry, distorted and warped discs, discs in binaries, disc instabilities, disc turbulence, etc. The meeting will be held in a hybrid format.
+The UKI discs meeting aims to bring together different astrophysical disc communities across the UK & Ireland. We are delighted to announce the fourth meeting of [this series](https://ukidiscs.github.io/) will be hosted at the Trinity College Dublin (TCD) on 5th-7th July 2027! The theme of the meeting will be _TBD_, covering observations and theory. Scientific topics include but are not limited to: protoplanetary discs, protosatellite discs, debris discs, disc formation and evolution, winds and jets, irradiated discs and proplyds, planet-disc interactions and migration, planet and planetesimal formation, exocomets, disc chemistry, distorted and warped discs, discs in binaries, disc instabilities, disc turbulence, etc. The meeting will be held in a hybrid format.
 
 The UKI discs meeting aims to bring together different astrophysical disc communities across the UK & Ireland. We also welcome attendees from beyond these isles but numbers on-site will be limited to approximately 100.
 
-For any queries, please email  [TBD](mailto:EMAIL). 
-
-## Invited Speakers
-- TBD
 
 ## SOC
 - Tim Pearce (chair) - TCD, Ireland
-- Luca Matra – TCD, Ireland
-- Farzana Meru - Warwick, UK 
-- Pooneh Nazari - Warwick, UK 
 - Ayaka Okuya - Warwick, UK 
+- Farzana Meru - Warwick, UK 
 - Loren Held - Cambridge, UK
+- Luca Matra – TCD, Ireland
+- Pooneh Nazari - Warwick, UK 
 - Thomas Jannaud - Cambridge, UK
 
 ## LOC
 - Sana Ahmed (co-chair) – TCD
 - Rossella Anania (co-chair) – TCD
+- Chloe Lawlor - University of Galway
+- Eoin Kenny - University of Galway
 - Jake Byrne – TCD
-- Patricia Luppe – TCD
-- Zoe Roumeliotis – TCD
 - Matúš Starčok – TCD
 - Oto Ulrich – TCD
-- Eoin Kenny - University of Galway
-- Chloe Lawlor - University of Galway
+- Patricia Luppe – TCD
+- Zoe Roumeliotis – TCD
 
 ## Important Dates
 - Registration and abstract submission opens: TBD              
@@ -50,7 +46,7 @@ We value the participation of all attendees and want to ensure everyone will hav
 
 This meeting will be a harassment-free environment for everyone, regardless of gender, sexual orientation, disability, physical appearance, race, nationality, and religion. We do not tolerate harassment of attendees in any form.
 
-- Presenters give their time freely. Many have travelled a considerable distance, some are very distinguished, and some are early career scientists perhaps giving a talk at this level for the first time. All deserve a fair and encouraging hearing. Please try to be on time for the start of a session, or otherwise enter quietly into the room, refrain from loud conversations outside the doors and switch off mobile phones, and if you must use a laptop, do so inconspicuously in one of the rear seats.
+- Presenters give their time freely. Many have travelled a considerable distance, some are senior, and some are early career scientists perhaps giving a talk at this level for the first time. All deserve a fair and encouraging hearing. Please try to be on time for the start of a session, or otherwise enter quietly into the back of the room, refrain from loud conversations outside the doors and switch off mobile phones, and if you must use a laptop, do so inconspicuously in one of the rear seats.
 
 - Harassment includes offensive verbal comments related to gender, sexual orientation, disability, physical appearance, body size, race, religion, sexual images in public spaces, deliberate intimidation, stalking, following, harassing photography or recording, sustained disruption of talks or other events, inappropriate physical contact, and unwelcome sexual attention.
 
