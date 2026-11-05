@@ -150,7 +150,7 @@ void main(){ float r = length(vL), a = atan(vW.z, vW.x);
 
 /* ---------- 4. Planetary system: 8 planets, irregular spacing, small inclinations, rings and moons ---------- */
 function system(ctx) {
-  const { T } = ctx, g = new T.Group(), rng = rngFrom(2027), r0 = ctx.inner + 0.9, r1 = 5.0;
+  const { T } = ctx, g = new T.Group(), rng = rngFrom(2027), r0 = ctx.inner + 0.9, r1 = 4.3;
   const SPEC = [   // size, surface colours, rings?, moons
     { s: .09, c: ['#8a8a8a', '#a09a92', '#6d6860'], rings: 0, moons: 0 },
     { s: .13, c: ['#e6d8b0', '#d8c28a', '#f2e8c8'], rings: 0, moons: 0 },
@@ -161,8 +161,9 @@ function system(ctx) {
     { s: .19, c: ['#6fa3d8', '#9cc6ea', '#5a8cc0'], rings: 1, moons: 1 },
     { s: .12, c: ['#5b6a8a', '#7a88a8', '#454f6b'], rings: 0, moons: 0 },
   ];
-  const inc = [], gaps = SPEC.map(() => 0.6 + rng()); let tot = 0; gaps.forEach(x => tot += x);
-  let r = r0 - gaps[0] / tot * (r1 - r0) * 0.0, acc = 0;
+  const gaps = SPEC.map((_, i) => 0.6 + rng() + (i === 4 ? 1.7 : 0)); let tot = 0; gaps.forEach(x => tot += x);   // extra room before planet 5 for the asteroid belt
+  const rads = []; { let a = 0; gaps.forEach(x => { a += x; rads.push(r0 + (a - gaps[0]) / (tot - gaps[0]) * (r1 - r0)); }); }
+  let acc = 0;
   const ringTex = canvasTex(ctx, 256, 4, (c, w, h) => {
     for (let x = 0; x < w; x++) { const u = x / w; let a = .5 + .4 * Math.sin(u * 37) * Math.sin(u * 11 + 1); if (u > .6 && u < .66) a = .05; c.fillStyle = `rgba(226,205,160,${Math.max(0, Math.min(1, a))})`; c.fillRect(x, 0, 1, h); }
   });
@@ -190,7 +191,13 @@ function system(ctx) {
     g.add(plane);
     return { spinner, body, moons, w: 0.85 / Math.pow(rad, 1.5), a0: rng() * TAU, spin: 0.5 + rng() };
   });
+  const ab0 = rads[3] + 0.18, ab1 = rads[4] - 0.3;                                  // asteroid belt between planets 4 and 5
+  const abDust = pointCloud(ctx, r2 => { const r = ab0 + r2() * (ab1 - ab0), a = r2() * TAU, k = .35 + r2() * .5; return { p: [r * Math.cos(a), gauss(r2) * .03, r * Math.sin(a)], c: [.95 * k, .8 * k, .6 * k] }; }, 1, 61, 6000);
+  const abRocks = rockField(ctx, 90, (r2) => ({ r: ab0 + r2() * (ab1 - ab0), a0: r2() * TAU, y: gauss(r2) * .03, s: .018 + Math.pow(r2(), 3) * .05, tx: r2() * 2, ty: r2() * 2, c: greyRock(r2, true) }), 62);
+  const kuiper = pointCloud(ctx, r2 => { const r = 4.8 + r2() * .65, a = r2() * TAU, k = .3 + r2() * .5; return { p: [r * Math.cos(a), gauss(r2) * .07, r * Math.sin(a)], c: [.6 * k, .78 * k, k] }; }, 1, 63, 7000);   // icy Kuiper belt
+  g.add(abDust.pts, abRocks.mesh, kuiper.pts);
   return { name: 'Planetary system', group: g, update(t) {
+    abDust.update(t); abRocks.update(t); kuiper.update(t);
     bodies.forEach(b => { b.spinner.rotation.y = -(b.a0 + t * b.w); b.body.rotation.y = t * b.spin; b.moons.forEach(m => { m.pivot.rotation.y = t * m.w; }); });
   } };
 }
@@ -355,12 +362,12 @@ function horseshoe(ctx) {
 
 /* ---------- 8. Comet cloud: an inclined icy disc plus comets with tails that point away from the star ---------- */
 function comets(ctx) {
-  const { T } = ctx, g = new T.Group(), rng = rngFrom(31), tilted = new T.Group(); tilted.rotation.set(.45, 0, .2);
-  const cloud = pointCloud(ctx, r2 => { const r = 3 + r2() * 2.3, a = r2() * TAU, k = .3 + r2() * .5; return { p: [r * Math.cos(a), gauss(r2) * .45, r * Math.sin(a)], c: [.6 * k, .8 * k, k] }; }, 1, 3, 9000);
+  const { T } = ctx, g = new T.Group(), rng = rngFrom(31), tilted = new T.Group(); tilted.rotation.set(.12, 0, .06);
+  const cloud = pointCloud(ctx, r2 => { const r = 3 + r2() * 1.9, a = r2() * TAU, k = .3 + r2() * .5; return { p: [r * Math.cos(a), gauss(r2) * .3, r * Math.sin(a)], c: [.6 * k, .8 * k, k] }; }, 1, 3, 9000);
   tilted.add(cloud.pts); g.add(tilted);
   const NC = 6, PT = 130, C = [];
   for (let i = 0; i < NC; i++) {
-    const a = 3.2 + rng() * 1.8, e = .45 + rng() * .25;
+    const a = 3.0 + rng() * .9, e = .4 + rng() * .2;
     C.push({ a, e, n: .7 / Math.pow(a, 1.5), M0: rng() * TAU, q: new T.Quaternion().setFromEuler(new T.Euler((rng() - .5) * 1.6, rng() * TAU, (rng() - .5) * .8)),
       nuc: new T.Mesh(new T.IcosahedronGeometry(.045, 1), new T.MeshStandardMaterial({ color: 0xcfd6e0, roughness: .9, flatShading: true })), off: Array.from({ length: PT }, () => [rng() - .5, rng() - .5, rng() - .5, rng()]) });
     g.add(C[i].nuc);
@@ -438,23 +445,57 @@ void main(){
   return { name: 'Young star with jets', group: g, update(t) { cloud.update(t); mat.uniforms.uTime.value = t; } };
 }
 
-/* ---------- 11. Pizza ---------- */
+/* ---------- 11. Pizza: puffy bubbled crust, real height on the cheese, and 3D toppings ---------- */
 function pizza(ctx) {
-  const { T, R } = ctx, g = new T.Group(), hole = ctx.inner, rim = R - .35, th = .12;
-  const top = canvasTex(ctx, 1024, 1024, (c, w) => {
-    const rng = rngFrom(4), C = w / 2, px = r => r / rim * C;
-    c.fillStyle = '#c4361e'; c.fillRect(0, 0, w, w);
-    for (let i = 0; i < 900; i++) { const a = rng() * TAU, r = (hole + rng() * (rim - hole)), x = C + Math.cos(a) * px(r), y = C + Math.sin(a) * px(r); c.fillStyle = `rgba(255,${200 + rng() * 40 | 0},${90 + rng() * 40 | 0},${.5 + rng() * .4})`; c.beginPath(); c.ellipse(x, y, 10 + rng() * 26, 8 + rng() * 18, rng() * 3, 0, TAU); c.fill(); }
-    for (let i = 0; i < 16; i++) { const a = rng() * TAU, r = hole + .5 + rng() * (rim - hole - 1), x = C + Math.cos(a) * px(r), y = C + Math.sin(a) * px(r), rad = px(.33);
-      c.fillStyle = '#9a2a1a'; c.beginPath(); c.arc(x, y, rad, 0, TAU); c.fill(); c.fillStyle = '#c4452d'; c.beginPath(); c.arc(x, y, rad * .85, 0, TAU); c.fill();
-      c.fillStyle = '#7a1d12'; for (let k = 0; k < 6; k++) c.fillRect(x + (rng() - .5) * rad, y + (rng() - .5) * rad, 5, 5); }
-    for (let i = 0; i < 40; i++) { const a = rng() * TAU, r = hole + rng() * (rim - hole), x = C + Math.cos(a) * px(r), y = C + Math.sin(a) * px(r); c.fillStyle = '#2f8a3a'; c.beginPath(); c.ellipse(x, y, 14, 7, rng() * 3, 0, TAU); c.fill(); }
-    c.strokeStyle = 'rgba(40,15,5,.6)'; c.lineWidth = 3; for (let i = 0; i < 8; i++) { const a = i / 8 * TAU; c.beginPath(); c.moveTo(C + Math.cos(a) * px(hole), C + Math.sin(a) * px(hole)); c.lineTo(C + Math.cos(a) * px(rim), C + Math.sin(a) * px(rim)); c.stroke(); }
-  });
+  const { T, R } = ctx, g = new T.Group(), hole = ctx.inner, rim = R - .35, th = .12, rng = rngFrom(4);
+  const blobs = Array.from({ length: 700 }, () => ({ a: rng() * TAU, r: hole + rng() * (rim - hole), rx: 10 + rng() * 26, ry: 8 + rng() * 18, rot: rng() * 3, al: .5 + rng() * .4, gg: 200 + rng() * 40 | 0, bb: 90 + rng() * 40 | 0 }));
+  const spots = Array.from({ length: 160 }, () => ({ a: rng() * TAU, r: hole + rng() * (rim - hole), s: 4 + rng() * 9 }));
+  function draw(c, w, bump) {                                         // same layout for the colour map and the height map
+    const C = w / 2, px = r => r / rim * C;
+    c.fillStyle = bump ? '#3a3a3a' : '#c4361e'; c.fillRect(0, 0, w, w);
+    blobs.forEach(o => {
+      c.save(); c.translate(C + Math.cos(o.a) * px(o.r), C + Math.sin(o.a) * px(o.r)); c.rotate(o.rot); c.scale(o.rx, o.ry);
+      if (bump) { const gr = c.createRadialGradient(0, 0, 0, 0, 0, 1); gr.addColorStop(0, '#fff'); gr.addColorStop(.7, '#aaa'); gr.addColorStop(1, 'rgba(120,120,120,0)'); c.fillStyle = gr; }
+      else c.fillStyle = `rgba(255,${o.gg},${o.bb},${o.al})`;
+      c.beginPath(); c.arc(0, 0, 1, 0, TAU); c.fill(); c.restore();
+    });
+    if (!bump) spots.forEach(o => { c.fillStyle = 'rgba(190,110,40,.45)'; c.beginPath(); c.arc(C + Math.cos(o.a) * px(o.r), C + Math.sin(o.a) * px(o.r), o.s, 0, TAU); c.fill(); });
+    c.strokeStyle = bump ? '#000' : 'rgba(40,15,5,.55)'; c.lineWidth = bump ? 6 : 3;                      // slice cuts
+    for (let i = 0; i < 8; i++) { const a = i / 8 * TAU; c.beginPath(); c.moveTo(C + Math.cos(a) * px(hole), C + Math.sin(a) * px(hole)); c.lineTo(C + Math.cos(a) * px(rim), C + Math.sin(a) * px(rim)); c.stroke(); }
+  }
+  const colTex = canvasTex(ctx, 1024, 1024, (c, w) => draw(c, w, false));
+  const hTex = canvasTex(ctx, 1024, 1024, (c, w) => draw(c, w, true), false);
   const body = new T.Mesh(new T.LatheGeometry([[hole, -th], [rim, -th], [rim, th], [hole, th], [hole, -th]].map(p => new T.Vector2(...p)), 96), new T.MeshStandardMaterial({ color: 0xd9a35a, roughness: .8, side: T.DoubleSide, envMapIntensity: .2 }));
-  const sauce = new T.Mesh(flat(T, new T.RingGeometry(hole, rim, 128, 1)), new T.MeshStandardMaterial({ map: top, roughness: .55, envMapIntensity: .5 })); sauce.position.y = th + .002;
-  const crust = new T.Mesh(new T.TorusGeometry(rim, .2, 20, 128), new T.MeshStandardMaterial({ color: 0xc98a3c, roughness: .85, envMapIntensity: .2 })); crust.rotation.x = Math.PI / 2; crust.position.y = th * .6;
-  g.add(body, sauce, crust);
+  const top = new T.Mesh(flat(T, new T.RingGeometry(hole, rim, 160, 56)), new T.MeshStandardMaterial({ map: colTex, bumpMap: hTex, bumpScale: 5, displacementMap: hTex, displacementScale: .07, displacementBias: -.02, roughness: .45, envMapIntensity: .6 }));
+  top.position.y = th + .002;
+  /* crust: noisy, puffy torus with a blistered, floury texture */
+  const cg = new T.TorusGeometry(rim, .22, 40, 220), pp = cg.attributes.position, nz = (x, y) => Math.sin(x * 3.1 + Math.sin(y * 2.3) * 2) * Math.sin(y * 4.7 + x * 1.3) * .5 + Math.sin(x * 9.1 + y * 5.3) * .25;
+  for (let i = 0; i < pp.count; i++) {
+    const x = pp.getX(i), y = pp.getY(i), z = pp.getZ(i), U = Math.atan2(y, x), cx = rim * Math.cos(U), cy = rim * Math.sin(U);
+    const dx = x - cx, dy = y - cy, k = 1 + .22 * nz(U * 6, z * 7), puff = .07 * nz(U * 3, 1.7);
+    pp.setXYZ(i, cx + dx * k + Math.cos(U) * puff, cy + dy * k + Math.sin(U) * puff, z * (1 + .25 * nz(U * 5, 3)));
+  }
+  cg.computeVertexNormals();
+  const crustTex = (srgb) => canvasTex(ctx, 512, 128, (c, w, h) => {
+    const r2 = rngFrom(9); c.fillStyle = srgb ? '#d9a050' : '#808080'; c.fillRect(0, 0, w, h);
+    for (let i = 0; i < 260; i++) { const x = r2() * w, y = r2() * h, s = 2 + r2() * 9; c.fillStyle = srgb ? `rgba(${110 + r2() * 40 | 0},${55 + r2() * 25 | 0},20,${.25 + r2() * .35})` : (r2() < .5 ? '#202020' : '#e0e0e0'); c.beginPath(); c.ellipse(x, y, s, s * .7, r2() * 3, 0, TAU); c.fill(); }   // blisters and char
+    if (srgb) for (let i = 0; i < 400; i++) { c.fillStyle = 'rgba(255,245,225,.18)'; c.fillRect(r2() * w, r2() * h, 2, 1); }   // flour
+  }, srgb);
+  const cMap = crustTex(true), cBump = crustTex(false); [cMap, cBump].forEach(t => { t.wrapS = t.wrapT = T.RepeatWrapping; t.repeat.set(10, 1); });
+  const crust = new T.Mesh(cg, new T.MeshStandardMaterial({ map: cMap, bumpMap: cBump, bumpScale: 4, roughness: .8, envMapIntensity: .25 })); crust.rotation.x = Math.PI / 2; crust.position.y = th * .6;
+  g.add(body, top, crust);
+  /* toppings: real geometry sitting on the cheese */
+  const place = () => { const a = rng() * TAU, r = hole + .55 + rng() * (rim - hole - 1.1); return [r * Math.cos(a), r * Math.sin(a), a]; };
+  const olive = new T.MeshStandardMaterial({ color: 0x1b1b22, roughness: .3, envMapIntensity: .7 });
+  for (let i = 0; i < 12; i++) { const [x, z] = place(), o = new T.Mesh(new T.TorusGeometry(.14, .06, 14, 24), olive); o.rotation.x = Math.PI / 2 + (rng() - .5) * .3; o.position.set(x, th + .085, z); g.add(o); }
+  const pep = new T.MeshStandardMaterial({ color: 0x3f9a3c, roughness: .4, envMapIntensity: .6 });
+  for (let i = 0; i < 16; i++) {
+    const [x, z] = place(), a0 = rng() * TAU, sw = 1.3 + rng() * 1.3, rr = .22 + rng() * .12, pts = [];
+    for (let k = 0; k <= 8; k++) { const a = a0 + sw * k / 8; pts.push(new T.Vector3(x + rr * Math.cos(a), th + .09 + .02 * Math.sin(k), z + rr * Math.sin(a))); }
+    g.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pts), 16, .035, 8), pep));
+  }
+  const leaf = new T.MeshStandardMaterial({ color: 0x2c8a3a, roughness: .55, envMapIntensity: .4 });
+  for (let i = 0; i < 10; i++) { const [x, z] = place(), l = new T.Mesh(new T.SphereGeometry(1, 14, 10), leaf); l.scale.set(.16, .02, .09); l.rotation.set((rng() - .5) * .4, rng() * TAU, (rng() - .5) * .4); l.position.set(x, th + .09, z); g.add(l); }
   return { name: 'Pizza', group: wrapGroup(T, g), update(t) { g.rotation.y = t * .3; } };
 }
 
@@ -510,4 +551,76 @@ function cymbal(ctx) {
   return { name: 'Cymbal', group: g, update(t) { mesh.rotation.y = t * .6; g.rotation.x = .09 * Math.sin(t * .9) + .05 * Math.sin(t * 11) * Math.exp(-((t % 6) * .9)); g.rotation.z = .07 * Math.sin(t * .7 + 1); } };
 }
 
-export const MODELS = { debris, dvd, vinyl, system, blackhole, belt, horseshoe, comets, circumbinary, jet, pizza, dartboard, ufo, cymbal };
+
+/* helper: stacks copies of one flat ring at different heights, flaring outwards, so a flat image gets real thickness */
+function stackedDisc(ctx, geo, makeMat, ys, sigma) {
+  const { T } = ctx, g = new T.Group(), w = ys.map(y => Math.exp(-Math.pow(y / sigma, 2))), tot = w.reduce((s, v) => s + v, 0), mats = [];
+  ys.forEach((y, i) => { const mat = makeMat(y, w[i] / tot * 1.15); mats.push(mat); const mesh = new T.Mesh(geo, mat); mesh.renderOrder = -1; g.add(mesh); });
+  return { group: g, mats };
+}
+const FLARE_VS = `uniform float uY; varying vec2 vL; void main(){ vL = position.xz; vec3 p = position; p.y += uY*pow(length(position.xz)/3., 1.3); gl_Position = projectionMatrix*modelViewMatrix*vec4(p, 1.); }`;
+const NOISE_GLSL = `float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7)))*43758.5453); }
+float n2(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f); return mix(mix(h(i), h(i+vec2(1,0)), f.x), mix(h(i+vec2(0,1)), h(i+vec2(1,1)), f.x), f.y); }`;
+const premul = (T, extra) => Object.assign({ transparent: true, depthWrite: false, blending: T.CustomBlending, blendEquation: T.AddEquation, blendSrc: T.OneFactor, blendDst: T.OneMinusSrcAlphaFactor, side: T.DoubleSide }, extra);
+
+/* ---------- Protoplanetary disc, ALMA-style: dust continuum rings in the afmhot colour map, with some thickness ---------- */
+function protoplanetary(ctx) {
+  const { T } = ctx, g = new T.Group(), R0 = ctx.inner + 0.3, R1 = 5.3, uTime = { value: 0 };
+  const geo = flat(T, new T.RingGeometry(R0, R1, 256, 8));
+  const fs = `varying vec2 vL; uniform float uTime, uOp;
+const float R0 = ${R0.toFixed(3)}, R1 = ${R1.toFixed(3)};
+${NOISE_GLSL}
+vec3 afmhot(float t){ return clamp(vec3(2.*t, 2.*t - .5, 2.*t - 1.), 0., 1.); }     // black, red, orange, yellow, white
+float ring(float r, float c, float w, float amp){ return amp*exp(-pow((r - c)/w, 2.)); }
+float wrap(float d){ return d - 6.2831*floor((d + 3.1416)/6.2831); }
+void main(){
+  float r = length(vL), a = atan(vL.y, vL.x);
+  if (r < R0 || r > R1) discard;
+  float ang = a - uTime*.03;                                                      // slow rigid drift (no shearing, so no spirals)
+  float I = .34*exp(-(r - R0)/2.4) + ring(r, R0 + .05, .45, .8);                 // pedestal + bright inner disc
+  I += ring(r, 1.95, .24, .50) + ring(r, 2.85, .22, .34*(1. + 1.4*exp(-pow(wrap(ang - 1.1)/.6, 2.)))) + ring(r, 3.75, .22, .25) + ring(r, 4.6, .2, .16);   // four broad rings, one with a crescent
+  vec2 pc = vec2(cos(ang), sin(ang));
+  float cl = .6*n2(pc*2.4 + vec2(floor(r*4.)*7.13, 0.)) + .4*n2(pc*7. + vec2(floor(r*7.)*3.7, 5.));   // clumps that stay inside their own ring
+  I *= (.55 + .9*cl) + .1*(n2(pc*45. + r*45.) - .5);
+  I *= smoothstep(R1, R1 - .5, r)*smoothstep(R0, R0 + .15, r);
+  vec3 c = afmhot(I*.95);
+  gl_FragColor = vec4(c*uOp, clamp(max(c.r, max(c.g, c.b))*1.1, 0., 1.)*uOp);
+}`;
+  const st = stackedDisc(ctx, geo, (y, op) => new T.ShaderMaterial(premul(T, { uniforms: { uTime, uOp: { value: op }, uY: { value: y } }, vertexShader: FLARE_VS, fragmentShader: fs })), [-.3, -.22, -.15, -.08, 0, .08, .15, .22, .3], .17);
+  g.add(st.group);
+  return { name: 'Protoplanetary disc (ALMA-style)', group: g, update(t) { uTime.value = t; } };
+}
+
+/* ---------- Debris disc, scattered-light image (SPHERE / GPI style): coronagraph mask, broad belt, one bright side ---------- */
+function scattered(ctx) {
+  const { T } = ctx, g = new T.Group(), R0 = 1.0, R1 = 5.4, uTime = { value: 0 };
+  const geo = flat(T, new T.RingGeometry(R0, R1, 256, 8));
+  const fs = `varying vec2 vL; uniform float uTime, uOp;
+const float R0 = ${R0.toFixed(3)}, R1 = ${R1.toFixed(3)};
+${NOISE_GLSL}
+void main(){
+  float r = length(vL), a = atan(vL.y, vL.x);
+  if (r < R0 || r > R1) discard;
+  float rc = 3.5*(1. - .10*cos(a - 2.2));                                          // belt centre is offset from the star
+  float x = r/rc;
+  float prof = x < 1. ? pow(x, 7.) : pow(x, -3.2);                                 // steep inside, shallow outside: a broken power law
+  float scat = .32 + 1.1*pow(.5 + .5*cos(a - 1.3), 2.);                            // forward scattering: one side brighter
+  vec2 pc = vec2(cos(a), sin(a));
+  float I = prof*scat*(.85 + .3*n2(pc*5. + vec2(r*.7, 3.)));
+  float sp = n2(vec2(a*70., r*2.5 + uTime*.03))*.7 + n2(vec2(a*23., r*4. + 9.))*.3;     // radial speckle left over after removing the star
+  I += .5*exp(-(r - R0)/.75)*sp*sp + .1*exp(-(r - R0)/2.4)*sp;
+  I += .1*(n2(pc*90. + r*90.) - .5)*step(2.2, r);                                  // photon grain
+  I *= smoothstep(R1, R1 - .7, r)*smoothstep(R0, R0 + .08, r);
+  vec3 c = vec3(.86, .92, 1.)*clamp(I*1.15, 0., 1.);                               // grey-blue, like the greyscale/bone maps these are shown in
+  gl_FragColor = vec4(c*uOp, clamp(I*1.15, 0., 1.)*uOp);
+}`;
+  const st = stackedDisc(ctx, geo, (y, op) => new T.ShaderMaterial(premul(T, { uniforms: { uTime, uOp: { value: op }, uY: { value: y } }, vertexShader: FLARE_VS, fragmentShader: fs })), [-.22, -.14, -.07, 0, .07, .14, .22], .13);
+  g.add(st.group);
+  const mask = new T.Mesh(new T.CircleGeometry(1.0, 64), new T.MeshBasicMaterial({ color: 0x000000, transparent: true, depthTest: false, depthWrite: false })); mask.renderOrder = 10; g.add(mask);   // coronagraph mask, always facing the camera
+  const q = new T.Quaternion();
+  return { name: 'Debris disc (scattered light)', group: g, hideStar: true, update(t) {
+    uTime.value = t; mask.parent.getWorldQuaternion(q); mask.quaternion.copy(q.invert()).multiply(ctx.cam.quaternion);
+  } };
+}
+
+export const MODELS = { scattered, protoplanetary, debris, dvd, vinyl, system, blackhole, belt, horseshoe, comets, circumbinary, jet, pizza, dartboard, ufo, cymbal };

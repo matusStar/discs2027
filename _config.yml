@@ -18,6 +18,9 @@ header:
   image: /assets/images/disc.jpg
   caption: "Credit: SpaceEngine © Cosmographic Software LLC."
 
+atom_feed:
+  hide: true            # removes the "Feed" link from the footer
+
 logo: "/assets/images/UKI_Logo_notext.png"
 
 plugins:

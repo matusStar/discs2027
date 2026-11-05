@@ -1,7 +1,7 @@
 /* hero-config.js: every setting for the 3D hero in one place. Edit values freely. */
 export const HERO = {
-  models: ['debris', 'dvd', 'vinyl', 'system', 'blackhole',
-           'belt', 'comets', 'circumbinary', 'pizza', 'dartboard', 'ufo', 'cymbal'],   // order shown; delete / reorder freely
+  models: ['comets', 'blackhole', 'circumbinary', 'protoplanetary', 'scattered', 'debris', 'system',   // astronomy first
+           'dvd', 'pizza', 'dartboard'],   // then the fun ones; order shown, delete / reorder freely. Also available: 'belt', 'vinyl', 'ufo', 'cymbal', 'horseshoe', 'jet'
   skyLens: true,       // black hole bends the background stars (false = off)
   bhBright: 1.6,       // brightness of the black hole's disc and dust (1 = old, 2 = much brighter)
   bhRes: 512,          // black hole ray-trace resolution (lower = faster start-up, 384 is fine too)
