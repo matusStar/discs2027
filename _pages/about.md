@@ -4,12 +4,18 @@ title: "About"
 
 ---
 
-_NOTE: This website is currently being updated for the 2027 conference. The information is not up to date_
+<!-- My draft -->
+The UK & Ireland Discs Meeting aims to share knowledge and build connections between astrophysical disc communities.
 
-The UKI discs meeting aims to bring together different astrophysical disc communities across the UK & Ireland. We are delighted to announce the fourth meeting of [this series](https://ukidiscs.github.io/) will be hosted at the Trinity College Dublin (TCD) on 5th-7th July 2027! The theme of the meeting will be _TBD_, covering observations and theory. Scientific topics include but are not limited to: protoplanetary discs, protosatellite discs, debris discs, disc formation and evolution, winds and jets, irradiated discs and proplyds, planet-disc interactions and migration, planet and planetesimal formation, exocomets, disc chemistry, distorted and warped discs, discs in binaries, disc instabilities, disc turbulence, etc.
+We are delighted to announce that the 2027 UK & Ireland Discs Meeting will be held on **5–7 July 2027** at **Trinity College Dublin** (TCD). This will be the first time that the UK & Ireland Discs Meeting is held in Ireland!
 
-The UKI discs meeting aims to bring together different astrophysical disc communities across the UK & Ireland. We also welcome attendees from beyond these isles!
+While the meeting has a particular focus on the UK and Ireland communities, we warmly welcome scientists and attendees from beyond these isles. We welcome researchers working on any aspects of astrophysical discs, with areas including (but are not limited to): protoplanetary discs, debris discs, white-dwarf discs, high-energy discs, and galactic discs.
 
+### About the Series & Community
+
+This is the fourth meeting of [this series](https://ukidiscs.github.io/).
+
+**Mailing List:** The UK & Ireland discs mailing list is a community mailing list for those working on various types of astrophysical discs. The goal behind the list is to share information on meetings, schools, PhD, postdoc and other academic positions related to astrophysical discs. You can find more details on [our mailing list page](https://warwick.ac.uk/fac/sci/physics/research/astro/research/discs/uki-discs/).
 
 ## SOC
 - Tim Pearce (chair) - TCD, Ireland
@@ -48,7 +54,7 @@ This meeting will be a harassment-free environment for everyone, regardless of g
 
 - Presenters give their time freely. Many have travelled a considerable distance, some are senior, and some are early career scientists perhaps giving a talk at this level for the first time. All deserve a fair and encouraging hearing. Please try to be on time for the start of a session, or otherwise enter quietly into the back of the room, refrain from loud conversations outside the doors and switch off mobile phones, and if you must use a laptop, do so inconspicuously in one of the rear seats.
 
-- Harassment includes offensive verbal comments related to gender, sexual orientation, disability, physical appearance, body size, race, religion, sexual images in public spaces, deliberate intimidation, stalking, following, harassing photography or recording, sustained disruption of talks or other events, inappropriate physical contact, and unwelcome sexual attention.
+- Harassment includes offensive verbal comments related to gender, sexual orientation, disability, physical appearance, body size, race, religion, sexual images in public spaces, deliberate intimidation, stalking, following, harassing photography or recording, sustained disruption of talks or other events, inappropriately aggressive comments and questions, inappropriate physical contact, and unwelcome sexual attention.
 
 - All communication given by presenters, organisers and attendees should be appropriate for a professional audience including people of many different backgrounds. Sexual language, jokes and imagery is not appropriate for any event.
 
