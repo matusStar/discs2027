@@ -150,7 +150,7 @@ void main(){ float r = length(vL), a = atan(vW.z, vW.x);
 
 /* ---------- 4. Planetary system: 8 planets, irregular spacing, small inclinations, rings and moons ---------- */
 function system(ctx) {
-  const { T } = ctx, g = new T.Group(), rng = rngFrom(2027), r0 = ctx.inner + 0.9, r1 = 4.3;
+  const { T } = ctx, g = new T.Group(), rng = rngFrom(2027), r0 = ctx.inner + 0.1;
   const SPEC = [   // size, surface colours, rings?, moons
     { s: .09, c: ['#8a8a8a', '#a09a92', '#6d6860'], rings: 0, moons: 0 },
     { s: .13, c: ['#e6d8b0', '#d8c28a', '#f2e8c8'], rings: 0, moons: 0 },
@@ -161,14 +161,15 @@ function system(ctx) {
     { s: .19, c: ['#6fa3d8', '#9cc6ea', '#5a8cc0'], rings: 1, moons: 1 },
     { s: .12, c: ['#5b6a8a', '#7a88a8', '#454f6b'], rings: 0, moons: 0 },
   ];
-  const gaps = SPEC.map((_, i) => 0.6 + rng() + (i === 4 ? 1.7 : 0)); let tot = 0; gaps.forEach(x => tot += x);   // extra room before planet 5 for the asteroid belt
-  const rads = []; { let a = 0; gaps.forEach(x => { a += x; rads.push(r0 + (a - gaps[0]) / (tot - gaps[0]) * (r1 - r0)); }); }
+  const GAP = [0, .5, .5, .5, 1.25, .58, .58, .58];                                // orbit spacing: wide room before planet 5 for the asteroid belt
+  const rads = []; { let a = r0; GAP.forEach(x => { a += x; rads.push(a); }); }
   let acc = 0;
   const ringTex = canvasTex(ctx, 256, 4, (c, w, h) => {
     for (let x = 0; x < w; x++) { const u = x / w; let a = .5 + .4 * Math.sin(u * 37) * Math.sin(u * 11 + 1); if (u > .6 && u < .66) a = .05; c.fillStyle = `rgba(226,205,160,${Math.max(0, Math.min(1, a))})`; c.fillRect(x, 0, 1, h); }
   });
-  const bodies = SPEC.map((sp, i) => {
-    acc += gaps[i]; const rad = r0 + (acc - gaps[0]) / (tot - gaps[0]) * (r1 - r0);
+  const bodies = SPEC.map((sp0, i) => {
+    const sp = { ...sp0, s: sp0.s * 0.8 };                                       // planet size (lower = smaller planets)
+    const rad = rads[i];
     const plane = new T.Group(); plane.rotation.set((rng() - .5) * .16, 0, (rng() - .5) * .16);          // small offset from the ecliptic
     const spinner = new T.Group(), holder = new T.Group(); holder.position.x = rad; holder.rotation.z = (rng() - .5) * 1.0;   // axial tilt
     const body = new T.Mesh(new T.SphereGeometry(sp.s, 32, 24), planetMaterial(ctx, sp.c, 30 + i));
@@ -191,12 +192,14 @@ function system(ctx) {
     g.add(plane);
     return { spinner, body, moons, w: 0.85 / Math.pow(rad, 1.5), a0: rng() * TAU, spin: 0.5 + rng() };
   });
-  const ab0 = rads[3] + 0.18, ab1 = rads[4] - 0.3;                                  // asteroid belt between planets 4 and 5
+  const ab0 = rads[3] + 0.35, ab1 = rads[4] - 0.4;                                  // asteroid belt between planets 4 and 5
   const abDust = pointCloud(ctx, r2 => { const r = ab0 + r2() * (ab1 - ab0), a = r2() * TAU, k = .35 + r2() * .5; return { p: [r * Math.cos(a), gauss(r2) * .03, r * Math.sin(a)], c: [.95 * k, .8 * k, .6 * k] }; }, 1, 61, 6000);
   const abRocks = rockField(ctx, 90, (r2) => ({ r: ab0 + r2() * (ab1 - ab0), a0: r2() * TAU, y: gauss(r2) * .03, s: .018 + Math.pow(r2(), 3) * .05, tx: r2() * 2, ty: r2() * 2, c: greyRock(r2, true) }), 62);
-  const kuiper = pointCloud(ctx, r2 => { const r = 4.8 + r2() * .65, a = r2() * TAU, k = .3 + r2() * .5; return { p: [r * Math.cos(a), gauss(r2) * .07, r * Math.sin(a)], c: [.6 * k, .78 * k, k] }; }, 1, 63, 7000);   // icy Kuiper belt
+  const kuiper = pointCloud(ctx, r2 => { const r = 6.0 + r2() * .55, a = r2() * TAU, k = .3 + r2() * .5; return { p: [r * Math.cos(a), gauss(r2) * .07, r * Math.sin(a)], c: [.6 * k, .78 * k, k] }; }, 1, 63, 7000);   // icy Kuiper belt
   g.add(abDust.pts, abRocks.mesh, kuiper.pts);
-  return { name: 'Planetary system', group: g, update(t) {
+  g.scale.setScalar(0.85);                                                            // shrink the whole system so the outer belt stays inside the frame
+  const root = new T.Group(); root.add(g);
+  return { name: 'Planetary system', group: root, update(t) {
     abDust.update(t); abRocks.update(t); kuiper.update(t);
     bodies.forEach(b => { b.spinner.rotation.y = -(b.a0 + t * b.w); b.body.rotation.y = t * b.spin; b.moons.forEach(m => { m.pivot.rotation.y = t * m.w; }); });
   } };
@@ -407,7 +410,8 @@ function circumbinary(ctx) {
     const t = (r - r0) / (5.2 - r0), k = .45 + rng() * .55;
     return { p: [r * Math.cos(a), gauss(rng) * .06 * Math.pow(r, 1.15), r * Math.sin(a)], c: lerp3([.9, .85, 1], [.55, .3, .8], t).map(v => v * k) };
   }, 1, 41);
-  const mk = (rad, rgb) => { const m = new T.Mesh(new T.SphereGeometry(rad, 32, 24), new T.MeshBasicMaterial({ color: new T.Color(...rgb) })); m.add(glowSprite(ctx, rgb, rad * 7)); return m; };
+  const bk = ctx.cfg.binaryBright || 1;                                           // brightness of the two stars (hero-config.js)
+  const mk = (rad, rgb) => { const m = new T.Mesh(new T.SphereGeometry(rad, 32, 24), new T.MeshBasicMaterial({ color: new T.Color(...rgb.map(v => v * bk)) })); m.add(glowSprite(ctx, rgb, rad * 7 * bk), glowSprite(ctx, rgb, rad * 3 * bk)); return m; };
   const A = mk(.36, [1, .78, .4]), B = mk(.26, [.85, .92, 1]);
   g.add(cloud.pts, A, B); const h = haze(ctx, 6.4, [.75, .6, 1], .8); if (h) g.add(h);
   return { name: 'Circumbinary disc', group: g, hideStar: true, update(t) {

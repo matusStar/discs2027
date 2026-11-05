@@ -15,6 +15,7 @@ export const HERO = {
   haze: 0.35,          // 0..1 glow plane around each disc (0 = off)
   envIntensity: 1,     // how strongly shiny models reflect the studio lights
   starLight: 18,       // how strongly the star lights planets
+  binaryBright: 1.8,    // brightness of the two stars in the circumbinary model (1 = old, 3 = very bright)
   planet: true,        // planet in the gap of the debris disc
   star: {
     radius: 0.3,
