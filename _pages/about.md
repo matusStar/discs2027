@@ -3,8 +3,6 @@ permalink: /
 title: "About"
 
 ---
-
-<!-- My draft -->
 The UK & Ireland Discs Meeting aims to share knowledge and build connections between astrophysical disc communities.
 
 We are delighted to announce that the 2027 UK & Ireland Discs Meeting will be held on **5–7 July 2027** at **Trinity College Dublin** (TCD). This will be the first time that the UK & Ireland Discs Meeting is held in Ireland!
