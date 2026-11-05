@@ -9,7 +9,7 @@ var store = [,{
     "excerpt":"To be announced   ","url": "http://localhost:4000/discs2027/info/"
   },{
     "title": "Mailing List",
-    "excerpt":"To be announced  ","url": "http://localhost:4000/discs2027/mailing-list/"
+    "excerpt":"The UK &amp; Ireland discs mailing list is a community mailing list for those working on various types of astrophysical discs. The goal behind the list is to share information on meetings, schools, PhD, postdoc and other academic positions related to astrophysical discs. You can find more details on our...","url": "http://localhost:4000/discs2027/mailing-list/"
   },{
     "title": "Participants",
     "excerpt":"To be announced  ","url": "http://localhost:4000/discs2027/participants/"
