@@ -27,8 +27,8 @@ This is the fourth meeting of [this series](https://ukidiscs.github.io/).
 - Thomas Jannaud - Cambridge, UK
 
 ## LOC
-- Sana Ahmed (co-chair) – TCD
 - Rossella Anania (co-chair) – TCD
+- Sana Ahmed (co-chair) – TCD
 - Chloe Lawlor - University of Galway
 - Eoin Kenny - University of Galway
 - Jake Byrne – TCD

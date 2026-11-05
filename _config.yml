@@ -36,3 +36,11 @@ defaults:
       type: pages
     values:
       layout: single
+
+footer:
+  links:
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/matusStar/discs2027"
+  # Text added here will appear in the bottom-right next to "Powered by Jekyll & Minimal Mistakes"
+  custom: "My Footer"
