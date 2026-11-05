@@ -81,6 +81,20 @@
 <script src="/discs2027/assets/js/swap.js" defer></script>
 <script type="module" src="/discs2027/assets/js/hero3d.js"></script>
 
+<!-- Opening links in a new tab instead of the same one -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var links = document.links;
+    for (var i = 0; i < links.length; i++) {
+      // This checks if the link points to an external website
+      if (links[i].hostname !== window.location.hostname) {
+        links[i].target = '_blank';
+        links[i].rel = 'noopener noreferrer';
+      }
+    }
+  });
+</script>
+
 <!-- end custom head snippets -->
 
   </head>
