@@ -505,7 +505,7 @@ function pizza(ctx) {
 
 /* ---------- 12. Dartboard (the star is the bullseye) ---------- */
 function dartboard(ctx) {
-  const { T, R } = ctx, g = new T.Group(), hole = ctx.inner, rad = R - .15, th = .08;
+  const { T, R } = ctx, g = new T.Group(), hole = ctx.inner, rad = R - .15, th = .16, rg = rngFrom(77);
   const nums = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
   const tex = canvasTex(ctx, 1024, 1024, (c, w) => {
     const C = w / 2, S = C - 2, seg = TAU / 20;
@@ -517,12 +517,47 @@ function dartboard(ctx) {
     c.strokeStyle = '#bbb'; c.lineWidth = 2; [.455, .5, .72, .765, .27].forEach(r => { c.beginPath(); c.arc(C, C, S * r, 0, TAU); c.stroke(); });
     for (let i = 0; i < 20; i++) { const a = -Math.PI / 2 + (i - .5) * seg; c.beginPath(); c.moveTo(C + Math.cos(a) * S * .27, C + Math.sin(a) * S * .27); c.lineTo(C + Math.cos(a) * S * .765, C + Math.sin(a) * S * .765); c.stroke(); }
     c.fillStyle = '#fff'; c.font = 'bold 54px sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.lineWidth = 1;                                                                             // sisal fibres: many short faint strokes
+    for (let k = 0; k < 60000; k++) { const x = rg() * w, y = rg() * w, a = rg() * TAU, l = 2 + rg() * 5; c.strokeStyle = rg() < .5 ? 'rgba(0,0,0,.16)' : 'rgba(255,240,210,.10)'; c.beginPath(); c.moveTo(x, y); c.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); c.stroke(); }
     nums.forEach((n, i) => { const a = -Math.PI / 2 + i * seg; c.save(); c.translate(C + Math.cos(a) * S * .88, C + Math.sin(a) * S * .88); c.rotate(a + Math.PI / 2); c.fillText(n, 0, 0); c.restore(); });
   });
-  const body = new T.Mesh(new T.LatheGeometry([[hole, -th], [rad, -th], [rad, th], [hole, th], [hole, -th]].map(p => new T.Vector2(...p)), 96), new T.MeshStandardMaterial({ color: 0x222222, roughness: .8, side: T.DoubleSide, envMapIntensity: .2 }));
-  const face = new T.Mesh(flat(T, new T.RingGeometry(hole, rad, 160, 1)), new T.MeshStandardMaterial({ map: tex, roughness: .7, envMapIntensity: .3 })); face.position.y = th + .002;
+  const bump = canvasTex(ctx, 512, 512, (c, w) => {                                               // height map of the sisal fibres
+    c.fillStyle = '#808080'; c.fillRect(0, 0, w, w); c.lineWidth = 1.5;
+    for (let k = 0; k < 40000; k++) { const x = rg() * w, y = rg() * w, a = rg() * TAU, l = 2 + rg() * 5, v = 70 + rg() * 120 | 0; c.strokeStyle = `rgb(${v},${v},${v})`; c.beginPath(); c.moveTo(x, y); c.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); c.stroke(); }
+  }, false);
+  const prof = [[hole, -th], [rad - .06, -th], [rad, -th + .06], [rad, th - .06], [rad - .06, th], [hole, th], [hole, -th]].map(p => new T.Vector2(...p));   // bevelled edge
+  const body = new T.Mesh(new T.LatheGeometry(prof, 128), new T.MeshStandardMaterial({ color: 0x1c1c1c, roughness: .9, side: T.DoubleSide, envMapIntensity: .2 }));
+  const face = new T.Mesh(flat(T, new T.RingGeometry(hole, rad, 160, 1)), new T.MeshStandardMaterial({ map: tex, bumpMap: bump, bumpScale: 2.5, roughness: .95, envMapIntensity: .25 })); face.position.y = th + .002;
   g.add(body, face);
-  return { name: 'Dartboard', group: wrapGroup(T, g), update(t) { g.rotation.y = t * .25; } };
+  const env = ctx.cfg.envIntensity, metal = new T.MeshStandardMaterial({ color: 0xc8ccd2, metalness: 1, roughness: .28, envMapIntensity: env }), wy = th + .012;
+  [.27, .455, .5, .72, .765].forEach(f => { const w = new T.Mesh(new T.TorusGeometry(rad * f, .0075, 6, 160), metal); w.rotation.x = Math.PI / 2; w.position.y = wy; g.add(w); });   // ring wires
+  const rw = new T.BoxGeometry(1, .015, .014);                                                     // radial wires between the numbers
+  for (let i = 0; i < 20; i++) { const a = -Math.PI / 2 + (i - .5) * TAU / 20, r0w = rad * .27, r1w = rad * .765, w = new T.Mesh(rw, metal);
+    w.scale.x = r1w - r0w; w.position.set(Math.cos(a) * (r0w + r1w) / 2, wy, Math.sin(a) * (r0w + r1w) / 2); w.rotation.y = -a; g.add(w); }
+  const brass = new T.MeshStandardMaterial({ color: 0xc9a44a, metalness: 1, roughness: .3, envMapIntensity: env }), tungsten = new T.MeshStandardMaterial({ color: 0x8a8f96, metalness: 1, roughness: .35, envMapIntensity: env });
+  const fl = new T.Shape(); fl.moveTo(0, 0); fl.lineTo(0, .34); fl.bezierCurveTo(.12, .36, .24, .28, .24, .16); fl.bezierCurveTo(.24, .06, .12, 0, 0, 0);   // rounded flight
+  const flightG = new T.ShapeGeometry(fl, 16), H = 1.8, FALL = .5, TIP = th + .03;
+  const darts = [[.478, -1.57, 0xd8242c], [.6, -1.95, 0x2b6be0], [.36, -1.25, 0x2b6be0]].map(([f, a, col], k0) => {   // [radius fraction, angle, flight colour]: treble 20 and two singles
+    const dart = new T.Group(), flightM = new T.MeshStandardMaterial({ color: col, roughness: .55, side: T.DoubleSide });
+    const part = (geo, mat, y) => { const o = new T.Mesh(geo, mat); o.position.y = y; dart.add(o); };
+    part(new T.ConeGeometry(.012, .3, 10), tungsten, .07);
+    part(new T.CylinderGeometry(.045, .04, .45, 16), brass, .38);
+    part(new T.CylinderGeometry(.014, .014, .3, 8), tungsten, .75);
+    for (let k = 0; k < 4; k++) { const w = new T.Mesh(flightG, flightM); w.position.y = .88; w.rotation.y = k * Math.PI / 2; dart.add(w); }
+    const x = Math.cos(a) * rad * f, z = Math.sin(a) * rad * f, lean = (k0 - 1) * .08; dart.visible = false; g.add(dart);
+    return { dart, x, z, lean, t0: .9 + k0 * 1.0 };
+  });
+  let clock = 0, lastT = -9;
+  const upd = (t) => {                                                                              // darts fall one by one and stick (restarts each time the model appears)
+    clock = t - lastT > .5 ? 0 : clock + (t - lastT); lastT = t;
+    darts.forEach(o => { const s = clock - o.t0, d = o.dart;
+      if (s < 0) { d.visible = false; return; }
+      d.visible = true; const u = Math.min(s / FALL, 1), w = Math.max(0, s - FALL);
+      d.position.set(o.x, TIP + H * (1 - u * u), o.z);
+      d.rotation.set(.35 * (1 - u) + o.lean + Math.exp(-w * 5) * Math.sin(w * 28) * .09, 0, -.25 * (1 - u) + o.lean * .5 + Math.exp(-w * 5) * Math.cos(w * 28) * .07);
+    });
+  };
+  return { name: 'Dartboard', group: wrapGroup(T, g), update(t) { g.rotation.y = t * .25; upd(t); } };
 }
 
 /* ---------- 13. UFO (a saucer ring with a glass band and chasing lights) ---------- */
