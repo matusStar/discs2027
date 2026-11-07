@@ -59,6 +59,12 @@ function start(host) {
 
   let visible = true; const io = new IntersectionObserver(es => { visible = es[0].isIntersecting; }); io.observe(host);
 
+  function advance() {                                                   // go to the next model now (used by the timer and by clicks)
+    phase = 'out'; pt = 0; nextIdx = (idx + 1) % keys.length; label.classList.add('is-fading');
+  }
+  renderer.domElement.style.cursor = 'pointer';
+  renderer.domElement.addEventListener('click', () => { if (keys.length > 1 && phase === 'hold') advance(); });   // click the hero to switch
+
   let raf = 0, last = performance.now(), time = 0;
   function frame(now) {
     raf = requestAnimationFrame(frame);
@@ -68,7 +74,7 @@ function start(host) {
     star.update(time, dt); active.update(time, dt);
     if (keys.length > 1) {
       pt += dt;
-      if (phase === 'hold' && pt > cfg.hold) { phase = 'out'; pt = 0; nextIdx = (idx + 1) % keys.length; label.classList.add('is-fading'); }
+      if (phase === 'hold' && pt > cfg.hold) advance();
       else if (phase === 'out') { scaleK = 1 - ease(Math.min(pt / (cfg.transition / 2), 1)); if (pt >= cfg.transition / 2) { swapTo(nextIdx); phase = 'in'; pt = 0; label.classList.remove('is-fading'); } }
       else if (phase === 'in') { scaleK = ease(Math.min(pt / (cfg.transition / 2), 1)); if (pt >= cfg.transition / 2) { phase = 'hold'; pt = 0; scaleK = 1; } }
       active.group.scale.setScalar(Math.max(scaleK, 0.001));
