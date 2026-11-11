@@ -17,23 +17,23 @@ This is the fourth meeting of [this series](https://ukidiscs.github.io/).
 
 ## SOC
 - Tim Pearce (chair) - TCD, Ireland
-- Ayaka Okuya - Warwick, UK 
-- Farzana Meru - Warwick, UK 
 - Loren Held - Cambridge, UK
-- Luca Matra – TCD, Ireland
-- Pooneh Nazari - Warwick, UK 
 - Thomas Jannaud - Cambridge, UK
+- Luca Matra – TCD, Ireland
+- Farzana Meru - Warwick, UK 
+- Pooneh Nazari - Warwick, UK 
+- Ayaka Okuya - Warwick, UK 
 
 ## LOC
-- Rossella Anania (co-chair) – TCD
 - Sana Ahmed (co-chair) – TCD
-- Chloe Lawlor - University of Galway
-- Eoin Kenny - University of Galway
+- Rossella Anania (co-chair) – TCD
 - Jake Byrne – TCD
-- Matúš Starčok – TCD
-- Oto Ulrich – TCD
+- Eoin Kenny - University of Galway
+- Chloe Lawlor - University of Galway
 - Patricia Luppe – TCD
 - Zoe Roumeliotis – TCD
+- Matúš Starčok – TCD
+- Oto Ulrich – TCD
 
 ## Important Dates
 - Registration and abstract submission opens: TBD              
