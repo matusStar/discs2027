@@ -18,7 +18,7 @@ This is the fourth meeting of [this series](https://ukidiscs.github.io/).
 ## SOC
 - Tim Pearce (chair) - TCD, Ireland
 - Loren Held - Cambridge, UK
-- Thomas Jannaud - Cambridge, UK
+- Thomas Jannaud - Potsdam, Germany
 - Luca Matra – TCD, Ireland
 - Farzana Meru - Warwick, UK 
 - Pooneh Nazari - Cambridge, UK 
