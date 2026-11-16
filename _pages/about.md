@@ -21,7 +21,7 @@ This is the fourth meeting of [this series](https://ukidiscs.github.io/).
 - Thomas Jannaud - Cambridge, UK
 - Luca Matra – TCD, Ireland
 - Farzana Meru - Warwick, UK 
-- Pooneh Nazari - Warwick, UK 
+- Pooneh Nazari - Cambridge, UK 
 - Ayaka Okuya - Warwick, UK 
 
 ## LOC
