@@ -4,7 +4,10 @@ title: "Info"
 
 ---
 
-## Travel
+- [Travel](#travel)
+- [Accommodation and Childcare](#Accommodation)
+
+## Travel {#travel}
 The best way to travel around Ireland is to use a TFI Leap Card, which can be used on public transport services:
 - Bus Éireann
 - Dublin Bus
@@ -16,7 +19,7 @@ A Leap Card can be purchased at SPAR or other TFI agents. More information avail
 ### Getting to TCD
 TCD is centrally located and can be reached by DART, Luas or bus.
 
-### From Dublin Airport:
+#### From Dublin Airport:
 There are several bus routes into Dublin city centre from the airport.
 - [Aircoach](https://www.aircoach.ie/?c=1795433245) has stops at Zone 2 outside Terminal 1 and Zone 20 outside Terminal 2. 
 - The [Dublin Express](https://www.dublinexpress.ie/dublin-city/dublin-airport-to-dublin-city) buses run from Zone 1 outside Terminal 1 and Zone 21 outside Terminal 2. 
@@ -27,7 +30,7 @@ Please refer to the airport [bus stop map](https://www.dublinairport.com/docs/de
 
 
 
-## Accommodation and Childcare
+## Accommodation and Childcare {#Accommodation}
 There is the possibility of booking for accommodation at the TCD guest house with limited availability. We will provide childcare upon request. More details will be provided in the upcoming months.
 
 
