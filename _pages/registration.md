@@ -4,4 +4,4 @@ title: "Registration and Abstract Submission"
 
 ---
 
-To be announced
+Registration and abstract submission will open sometime around mid-late January, 2027.

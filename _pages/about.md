@@ -9,31 +9,33 @@ We are delighted to announce that the 2027 UK & Ireland Discs Meeting will be he
 
 While the meeting has a particular focus on the UK and Ireland communities, we warmly welcome scientists and attendees from beyond these isles. We welcome researchers working on any aspects of astrophysical discs, with areas including (but are not limited to): protoplanetary discs, debris discs, white-dwarf discs, high-energy discs, and galactic discs.
 
+For any queries, please email [uki2027@tcd.ie](mailto:uki2027@tcd.ie).
+
 ### About the Series & Community
 
 This is the fourth meeting of [this series](https://ukidiscs.github.io/).
 
 **Mailing List:** The UK & Ireland discs mailing list is a community mailing list for those working on various types of astrophysical discs. The goal behind the list is to share information on meetings, schools, PhD, postdoc and other academic positions related to astrophysical discs. You can find more details on [our mailing list page](https://warwick.ac.uk/fac/sci/physics/research/astro/research/discs/uki-discs/).
 
-## SOC
-- Tim Pearce (chair) - TCD, Ireland
-- Loren Held - Cambridge, UK
-- Thomas Jannaud - Potsdam, Germany
-- Luca Matra – TCD, Ireland
-- Farzana Meru - Warwick, UK 
-- Pooneh Nazari - Cambridge, UK 
-- Ayaka Okuya - Warwick, UK 
+## Scientific Organising Committee
+- Tim Pearce (chair) - Trinity College Dublin, Ireland
+- Loren Held - University of Cambridge, UK
+- Thomas Jannaud - Universität Potsdam, Germany
+- Luca Matra – Trinity College Dublin, Ireland
+- Farzana Meru - University of Warwick, UK 
+- Pooneh Nazari - University of Cambridge, UK
+- Ayaka Okuya - University of Warwick, UK 
 
-## LOC
-- Sana Ahmed (co-chair) – TCD
-- Rossella Anania (co-chair) – TCD
-- Jake Byrne – TCD
-- Eoin Kenny - University of Galway
-- Chloe Lawlor - University of Galway
-- Patricia Luppe – TCD
-- Zoe Roumeliotis – TCD
-- Matúš Starčok – TCD
-- Oto Ulrich – TCD
+## Local Organising Committee
+- Sana Ahmed (co-chair) – Trinity College Dublin, Ireland
+- Rossella Anania (co-chair) – Trinity College Dublin, Ireland
+- Jake Byrne – Trinity College Dublin, Ireland
+- Eoin Kenny - University of Galway, Ireland
+- Chloe Lawlor - University of Galway, Ireland
+- Patricia Luppe – Trinity College Dublin, Ireland
+- Zoe Roumeliotis – Trinity College Dublin, Ireland
+- Matúš Starčok – Trinity College Dublin, Ireland
+- Oto Ulrich – Trinity College Dublin, Ireland
 
 ## Important Dates
 - Registration and abstract submission opens: TBD              
@@ -62,6 +64,6 @@ This meeting will be a harassment-free environment for everyone, regardless of g
 
 - Participants asked to stop any harassing behaviour are expected to comply immediately. Attendees violating these rules may be asked to leave the event, without a refund of any charge.
 
-If someone wishes to report a breach of this code of conduct with regards to this meeting, then they should contact any of the LOC in person or by email (including anonymously) to [TBD](mailto:TBD).
+If someone wishes to report a breach of this code of conduct with regards to this meeting, then they should contact any of the LOC in person or by email (including anonymously) to [uki2027@tcd.ie](mailto:uki2027@tcd.ie).
 
 
